@@ -3,7 +3,7 @@
 [API](./api/) | [Client](./client/)
 
 This year's offering expands upon last year's [PWA](https://github.com/eddmann/secret-santa-pwa), transforming it into a full-fledged platform complete with an accompanying iOS/Android application (coming soon).
-It brings holiday cheer by making Secret Santa draws a breeze to organize and enjoy, whether gathered around the tree or connected online! 🎄
+It brings holiday cheer by making Secret Santa draws a breeze to organise, whether gathered around the tree or connected online! 🎄
 
 The service was built in a RAD manner, with a self-imposed time constraint of just a couple of evenings for development - driven by the goal of getting something shipped! 🚀
 
@@ -20,7 +20,7 @@ The service was built in a RAD manner, with a self-imposed time constraint of ju
   - Participants can optionally register with the service.
   - Allocations are linked to accounts based on email address, consolidating access to all associated draws.
 
-## Future Features:
+## Future Features
 
 - **Prefill Draw Entries**: Automatically populate draw participants from the previous year's draw.
 - **Enhanced Gift Ideas**: Support for various idea types (URLs, images, etc.).
@@ -53,3 +53,13 @@ This project builds on last year's PWA by incorporating a backend API, enabling 
 - SQS for background/asynchronous Laravel jobs
 - S3 bucket for static Client deployment
 - Fronted by a CloudFront distribution that manages caching concerns
+
+## Other Years
+
+Interested in seeing how I over-engineered the problem of allocating Secret Santa's in other years?
+
+- 2020 - [Clojure Secret Santa](https://github.com/eddmann/clojure-secret-santa)
+- 2021 - [Pico Secret Santa](https://github.com/eddmann/pico-secret-santa)
+- 2022 - [Step Function Secret Santa](https://github.com/eddmann/step-function-secret-santa)
+- 2023 - [Secret Santa PWA](https://github.com/eddmann/secret-santa-pwa)
+- 2024 - [Secret Santa Draw](https://github.com/eddmann/secret-santa-draw)
