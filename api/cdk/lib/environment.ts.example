@@ -1,0 +1,18 @@
+export const environment = {
+  APP_KEY: "",
+  APP_URL: "",
+
+  DB_CONNECTION: "pgsql",
+  DB_HOST: "",
+  DB_PORT: "5432",
+  DB_DATABASE: "",
+  DB_USERNAME: "",
+  DB_PASSWORD: "",
+
+  MAIL_MAILER: "mailgun",
+  MAIL_FROM_ADDRESS: "",
+  MAIL_FROM_NAME: "",
+  MAILGUN_DOMAIN: "",
+  MAILGUN_SECRET: "",
+  MAILGUN_ENDPOINT: "api.eu.mailgun.net",
+};
