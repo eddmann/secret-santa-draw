@@ -1,6 +1,6 @@
 # 🎅 Secret Santa Draw
 
-[API](./api/) | [Client](./client/)
+[API](./api/) | [Client](./client/) | [iOS](./ios/)
 
 This year's offering expands upon last year's [PWA](https://github.com/eddmann/secret-santa-pwa), transforming it into a full-fledged platform complete with an accompanying iOS/Android application (coming soon).
 It brings holiday cheer by making Secret Santa draws a breeze to organise, whether gathered around the tree or connected online! 🎄
@@ -45,6 +45,13 @@ This project builds on last year's PWA by incorporating a backend API, enabling 
 - Vite
 - PWA features, such as offline support
 - Uses the [Ketting](https://github.com/badgateway/ketting) HTTP library to manage access to the HAL-based API
+
+### iOS Application
+
+- Thin application which wraps PWA
+- Swift
+- Universal Link support
+- Based on the great [ios-pwa-wrap](https://github.com/khmyznikov/ios-pwa-wrap) project!
 
 ### Infrastructure
 
