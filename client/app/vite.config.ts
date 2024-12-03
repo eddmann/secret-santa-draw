@@ -25,7 +25,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         globIgnores: ['screenshots/*', 'ios-splash-screens/*'],
-        navigateFallbackDenylist: [/\/api\/*/],
+        navigateFallbackDenylist: [/\/api\/*/, /\.well-known\/*/],
       },
       devOptions: {
         enabled: false,
