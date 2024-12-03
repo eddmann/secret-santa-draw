@@ -32,7 +32,9 @@ export const useSnowfall = (initial: Props): ReactNode => {
   const [snowflakes, setSnowflakes] = useState(initial.snowflakes.start);
   const [speed, setSpeed] = useState(initial.speed.start);
   const [wind, setWind] = useState(initial.speed.start);
-  const [isIOSPermissionRequired, setIsIOSPermissionRequired] = useState('requestPermission' in DeviceMotionEvent);
+  const [isIOSPermissionRequired, setIsIOSPermissionRequired] = useState(
+    typeof DeviceMotionEvent !== 'undefined' && 'requestPermission' in DeviceMotionEvent,
+  );
 
   const requestIOSPermission = async () => {
     await (DeviceMotionEvent as unknown as DeviceOrientationEventiOS).requestPermission();
