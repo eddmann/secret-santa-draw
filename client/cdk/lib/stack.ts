@@ -29,7 +29,7 @@ export class SecretSantaClientStack extends Stack {
 
     new BucketDeployment(this, "CachedBucketDeployment", {
       destinationBucket: bucket,
-      sources: [Source.asset(CODE_PATH, { exclude: UNCACHED_ASSETS })],
+      sources: [Source.asset(CODE_PATH, { exclude: [...UNCACHED_ASSETS, ".well-known/*"] })],
       cacheControl: [CacheControl.setPublic(), CacheControl.maxAge(Duration.days(365)), CacheControl.immutable()],
       prune: false,
     });
@@ -38,6 +38,17 @@ export class SecretSantaClientStack extends Stack {
       destinationBucket: bucket,
       sources: [Source.asset(CODE_PATH, { exclude: ["*", ...UNCACHED_ASSETS.map((asset) => `!${asset}`)] })],
       cacheControl: [CacheControl.noCache(), CacheControl.noStore(), CacheControl.mustRevalidate()],
+      prune: false,
+    });
+
+    // need to ensure that the `apple-app-site-association` has an `application/json` content type.
+    // as there is only a single file in .well-known at this time we deploy the entire directory with
+    // this content type.
+    new BucketDeployment(this, "WellKnownBucketDeployment", {
+      destinationBucket: bucket,
+      sources: [Source.asset(CODE_PATH, { exclude: ["*", "!.well-known/*"] })],
+      cacheControl: [CacheControl.noCache(), CacheControl.noStore(), CacheControl.mustRevalidate()],
+      contentType: "application/json",
       prune: false,
     });
 
