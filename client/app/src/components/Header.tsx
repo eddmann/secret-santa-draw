@@ -11,7 +11,7 @@ const Root = styled.div`
     ${({ theme }) => theme.spacing.padding.s} ${({ theme }) => theme.spacing.padding.m};
   background-color: ${({ theme }) => theme.colors.background};
   max-width: 600px;
-  margin: env(safe-area-inset-top) auto 0;
+  margin: ${() => (document.cookie.includes('iOS App Store') ? '0' : 'env(safe-area-inset-top)')} auto 0;
   z-index: 1;
 
   &::after {
