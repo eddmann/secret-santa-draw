@@ -1,4 +1,5 @@
 import { unwrapResult } from '@reduxjs/toolkit';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled, { keyframes } from 'styled-components';
@@ -47,7 +48,7 @@ const DeleteAccount = styled.div`
   position: fixed;
   cursor: pointer;
   z-index: 1000;
-  bottom: 10px;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
   left: 10px;
 `;
 
@@ -55,6 +56,7 @@ export const Home = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector(userSelector);
+  const [deleteAccountConfirm, setDeleteAccountConfirm] = useState(false);
 
   const Snowfall = useSnowfall({
     snowflakes: {
@@ -121,15 +123,19 @@ export const Home = () => {
       {user.canDeleteAccount && (
         <DeleteAccount
           onClick={() => {
-            confirm('Are you sure you want to delete your account?') &&
-              void dispatch(deleteAccount())
-                .then(unwrapResult)
-                .then(() => {
-                  toast.success('Successfully deleted your account.');
-                });
+            if (!deleteAccountConfirm) {
+              setDeleteAccountConfirm(true);
+              return;
+            }
+
+            void dispatch(deleteAccount())
+              .then(unwrapResult)
+              .then(() => {
+                toast.success('Successfully deleted your account.');
+              });
           }}
         >
-          Delete Account
+          {deleteAccountConfirm ? 'Click to confirm?' : 'Delete Account'}
         </DeleteAccount>
       )}
       <SantaPopup />
