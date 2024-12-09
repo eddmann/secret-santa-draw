@@ -35,19 +35,3 @@ test('fails to authenticate an unknown email address', function () {
 
     $response->assertStatus(401);
 });
-
-test('who is a guest session', function () {
-    $response = $this->get('/api/whoami');
-
-    $response->assertStatus(401);
-});
-
-test('who is an authenticated session', function () {
-    $user = User::factory()->createOne();
-
-    $response = $this
-        ->actingAs($user)
-        ->get('/api/whoami');
-
-    $response->assertJson($user->toArray());
-});

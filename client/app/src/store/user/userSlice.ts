@@ -8,6 +8,7 @@ export const initialState = {
   canLogout: false,
   canRegister: false,
   canAccessGroups: false,
+  canDeleteAccount: false,
 
   isLoggingIn: false,
   isRegistering: false,
@@ -27,6 +28,7 @@ export const userSlice = createSlice({
       state.canLogout = action.payload.canLogout;
       state.canRegister = action.payload.canRegister;
       state.canAccessGroups = action.payload.canAccessGroups;
+      state.canDeleteAccount = action.payload.canDeleteAccount;
     });
     builder.addCase(bootstrap.rejected, () => {
       return { ...initialState, isBootstrapping: false };

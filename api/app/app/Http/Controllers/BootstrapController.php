@@ -10,7 +10,7 @@ class BootstrapController
             return response()->json([
                 '_links' => [
                     'register' => [
-                        'href' => route('register'),
+                        'href' => route('account.register'),
                     ],
                     'login' => [
                         'href' => route('login'),
@@ -26,6 +26,9 @@ class BootstrapController
                 ],
                 'groups' => [
                     'href' => route('groups'),
+                ],
+                'delete-account' => [
+                    'href' => route('account.delete'),
                 ],
             ],
             'user' => auth()->user()->toArray(),

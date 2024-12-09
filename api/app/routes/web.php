@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AllocationController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\BootstrapController;
@@ -10,13 +11,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/api/bootstrap', [BootstrapController::class, 'index'])
     ->name('bootstrap');
 
-Route::controller(AuthenticationController::class)->group(function () {
-    Route::post('/api/register', 'register')->name('register');
-    Route::post('/api/login', 'login')->name('login');
-    Route::post('/api/logout', 'logout')->name('logout');
-    Route::get('/api/whoami', 'whoami')
+Route::controller(AccountController::class)->group(function () {
+    Route::post('/api/register', 'register')->name('account.register');
+    Route::get('/api/account', 'show')
         ->middleware('auth:sanctum')
-        ->name('whoami');
+        ->name('account.show');
+    Route::delete('/api/account', 'delete')
+        ->middleware('auth:sanctum')
+        ->name('account.delete');
+});
+
+Route::controller(AuthenticationController::class)->group(function () {
+    Route::post('/api/login', 'login')->name('login');
+    Route::post('/api/logout', 'logout')
+        ->middleware('auth:sanctum')
+        ->name('logout');
 });
 
 Route::controller(GroupController::class)->group(function () {

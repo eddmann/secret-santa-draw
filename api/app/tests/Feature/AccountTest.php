@@ -35,3 +35,42 @@ test('fails to register a new participant with missing properties', function () 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors(['name', 'email', 'password']);
 });
+
+test('fails to show account details for guest session', function () {
+    $response = $this->get('/api/account');
+
+    $response->assertStatus(401);
+});
+
+test('shows account details for authenticated session', function () {
+    $user = User::factory()->createOne();
+
+    $response = $this
+        ->actingAs($user)
+        ->get('/api/account');
+
+    $response->assertJson($user->toArray());
+});
+
+test('deletes an authenticated users account', function () {
+    $user = User::factory()->createOne();
+    $group = $this
+        ->actingAs($user)
+        ->post('/api/groups', [
+            'title' => 'Test Title',
+        ]);
+    $this
+        ->actingAs($user)
+        ->post($group['_links']['conduct-draw']['href'], [
+            'description' => 'Sample description',
+            'participants' => $this->participants(),
+        ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->delete('/api/account');
+
+    $response->assertAccepted();
+    auth()->forgetGuards();
+    $this->get('/api/account')->assertStatus(401);
+});

@@ -8,7 +8,7 @@ import { SantaPopup } from '@/components/SantaPopup';
 import { useSnowfall } from '@/hooks/useSnowfall';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { userSelector } from '@/store/user';
-import { logout } from '@/store/user/actions';
+import { deleteAccount, logout } from '@/store/user/actions';
 
 const slideDown = keyframes`
   from {
@@ -40,6 +40,15 @@ const DrawRoot = styled.div`
   display: flex;
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing.padding.m};
+`;
+
+const DeleteAccount = styled.div`
+  font-size: 0.85rem;
+  position: fixed;
+  cursor: pointer;
+  z-index: 1000;
+  bottom: 10px;
+  left: 10px;
 `;
 
 export const Home = () => {
@@ -109,6 +118,20 @@ export const Home = () => {
           />
         )}
       </NavigationRoot>
+      {user.canDeleteAccount && (
+        <DeleteAccount
+          onClick={() => {
+            confirm('Are you sure you want to delete your account?') &&
+              void dispatch(deleteAccount())
+                .then(unwrapResult)
+                .then(() => {
+                  toast.success('Successfully deleted your account.');
+                });
+          }}
+        >
+          Delete Account
+        </DeleteAccount>
+      )}
       <SantaPopup />
       {Snowfall}
     </>

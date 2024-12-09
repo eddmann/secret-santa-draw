@@ -18,6 +18,7 @@ export const bootstrap = createAsyncThunk('user/bootstrap', async () => {
     canRegister: resource.links.has('register'),
     canLogout: resource.links.has('logout'),
     canAccessGroups: resource.links.has('groups'),
+    canDeleteAccount: resource.links.has('delete-account'),
   };
 });
 
@@ -70,3 +71,14 @@ export const register = createAsyncThunk(
     }
   },
 );
+
+export const deleteAccount = createAsyncThunk('user/deleteAccount', async (_, { dispatch }) => {
+  try {
+    const action = await client.go().follow('delete-account');
+    await action.delete();
+
+    await dispatch(bootstrap());
+  } catch (error) {
+    await notifyAndThrowErrorMessage(error, 'Failed to delete your account.');
+  }
+});
