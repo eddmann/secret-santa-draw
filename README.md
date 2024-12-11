@@ -1,5 +1,7 @@
 # 🎅 Secret Santa Draw
 
+<a href="https://apps.apple.com/gb/app/secret-santa-draw/id6738795018"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" /></a>
+
 [API](./api/) | [Client](./client/) | [iOS](./ios/)
 
 This year's offering expands upon last year's [PWA](https://github.com/eddmann/secret-santa-pwa), transforming it into a full-fledged platform complete with an accompanying iOS/Android application (coming soon).
