@@ -14,74 +14,77 @@ class OfficeGroupSeeder extends Seeder
     {
         $admin = User::where('email', 'test@example.com')->firstOrFail();
 
-        // Create Office Secret Santa group
         $officeGroup = Group::create([
             'owner_id' => $admin->id,
             'title' => 'Office Secret Santa',
         ]);
 
-        // Create 2024 draw with completed allocations and gift ideas
         $draw2024 = Draw::create([
             'group_id' => $officeGroup->id,
             'year' => 2024,
-            'description' => '2024 Office Secret Santa',
+            'description' => 'Ho ho ho! Our 2024 Christmas Secret Santa - £30 budget per gift. Happy holidays everyone!',
         ]);
 
-        // Create allocations for 2024 (completed with gift ideas)
-        // These exercise various gift idea formats: links, text, multiline, short, long, mixed
         $allocations2024 = [
             [
-                'from_name' => 'Alice Johnson',
+                'from_name' => 'Alice',
                 'from_email' => 'alice@example.com',
                 'to_email' => 'bob@example.com',
                 'from_ideas' => [
-                    'https://www.amazon.com/Ember-Temperature-Control-Smart-Mug/dp/B07NQRM6ML',
-                    "Mechanical keyboard with cherry MX switches\nPrefer something with RGB lighting if possible\nBudget around $150",
+                    'https://example.com/ember-temperature-control-smart-mug',
+                    "Mechanical keyboard with cherry MX switches - preferably something with RGB lighting if possible, hot-swappable switches would be a bonus\nBudget around $150-200\nBrown or blue switches preferred over red",
+                    'Socks',
                     'Coffee subscription',
-                    'https://www.etsy.com/listing/custom-desk-nameplate',
+                    'This smart mug is amazing: https://example.com/coffee-grinder-burr-type',
+                    'A nice pen',
                 ],
             ],
             [
-                'from_name' => 'Bob Smith',
+                'from_name' => 'Bob',
                 'from_email' => 'bob@example.com',
                 'to_email' => 'charlie@example.com',
                 'from_ideas' => [
-                    'Board game',
-                    'https://www.target.com/p/nintendo-switch-pro-controller/-/A-52052007',
+                    'Board game - preferably strategy or cooperative games like Pandemic, Ticket to Ride, or Azul',
+                    'https://example.com/nintendo-switch-pro-controller',
+                    'Really anything related to gaming would be appreciated! I love both video games and tabletop games, so gift cards to Steam, Nintendo eShop, or local board game stores would all be great. Also into puzzle games and RPGs if you want to pick something specific.',
                 ],
             ],
             [
-                'from_name' => 'Charlie Brown',
+                'from_name' => 'Charlie',
                 'from_email' => 'charlie@example.com',
                 'to_email' => 'diana@example.com',
                 'from_ideas' => [
-                    "A really nice reusable water bottle - maybe one of those insulated ones that keeps drinks cold for 24 hours. I've been trying to reduce single-use plastic and having a great water bottle would help with that goal.",
-                    'Yoga mat',
-                    'https://www.lululemon.com/en-us/p/the-reversible-mat-5mm/prod8430206.html',
-                    'Gym bag or athletic backpack',
+                    "A really nice reusable water bottle - maybe one of those insulated ones that keeps drinks cold for 24 hours and hot for 12 hours. I've been trying to reduce single-use plastic and having a great water bottle would help with that goal. Bonus points if it fits in a standard cup holder!",
+                    'Mat',
+                    'Something like this https://example.com/reversible-yoga-mat-5mm would be perfect',
+                    'https://example.com/gym-duffle-bag-with-shoe-compartment',
+                    'Resistance bands set',
                 ],
             ],
             [
-                'from_name' => 'Diana Prince',
+                'from_name' => 'Diana',
                 'from_email' => 'diana@example.com',
                 'to_email' => 'ethan@example.com',
                 'from_ideas' => [
-                    'Movie tickets gift card',
-                    'https://www.bookshop.org/books/project-hail-mary/9780593135204',
-                    "Noise-canceling headphones\nDoes a lot of video calls\nWould appreciate good audio quality",
-                    'https://www.rei.com/product/hiking-backpack-20l',
+                    'Gift card',
+                    'This book looks great https://example.com/project-hail-mary-hardcover-book - heard amazing things about it!',
+                    "Noise-canceling headphones or earbuds - does a lot of video calls from home and the background noise can be distracting\nWould appreciate good audio quality for both calls and music\nOver-ear preferred but good in-ear buds would work too\nBudget flexible up to $250",
+                    'https://example.com/hiking-backpack-20l-with-hydration-bladder-compatibility',
+                    'Gloves',
+                    'Running shoes gift card or store credit - size 9.5 mens',
                 ],
             ],
             [
-                'from_name' => 'Ethan Hunt',
+                'from_name' => 'Ethan',
                 'from_email' => 'ethan@example.com',
                 'to_email' => 'alice@example.com',
                 'from_ideas' => [
-                    'https://www.uncommongoods.com/product/tea-forte-warming-joy-petite-presentation-box',
-                    'Book: "The Design of Everyday Things" by Don Norman',
-                    'Cozy blanket',
-                    'https://www.sephora.com/product/lavender-essential-oil-P428053',
-                    'Scented candles - loves vanilla or lavender scents',
+                    'https://example.com/tea-forte-warming-joy-petite-presentation-box-assorted-flavors',
+                    'Book: "The Design of Everyday Things" by Don Norman - or really any book on UX design, psychology, or product design would be great',
+                    'Blanket',
+                    'Essential oils like https://example.com/lavender-essential-oil are always appreciated',
+                    'Scented candles - loves vanilla, lavender, or eucalyptus scents',
+                    'A cozy reading nook setup would be amazing - thinking soft throw blanket, book light (maybe something like https://example.com/rechargeable-book-light), maybe a small side table or book stand. Loves to read before bed and wants to create a dedicated space for it. Aesthetic is modern minimal with warm wood tones.',
                 ],
             ],
         ];
@@ -98,42 +101,40 @@ class OfficeGroupSeeder extends Seeder
             ]);
         }
 
-        // Create 2025 draw with allocations but no gift ideas
         $draw2025 = Draw::create([
             'group_id' => $officeGroup->id,
             'year' => 2025,
-            'description' => '2025 Office Secret Santa',
+            'description' => 'Christmas 2025 Secret Santa! £30 budget. Let the festive gifting begin!',
         ]);
 
-        // Create allocations for 2025 (no gift ideas)
         $allocations2025 = [
             [
-                'from_name' => 'Alice Johnson',
+                'from_name' => 'Alice',
                 'from_email' => 'alice@example.com',
                 'to_email' => 'frank@example.com',
             ],
             [
-                'from_name' => 'Bob Smith',
+                'from_name' => 'Bob',
                 'from_email' => 'bob@example.com',
                 'to_email' => 'grace@example.com',
             ],
             [
-                'from_name' => 'Charlie Brown',
+                'from_name' => 'Charlie',
                 'from_email' => 'charlie@example.com',
                 'to_email' => 'alice@example.com',
             ],
             [
-                'from_name' => 'Frank Castle',
+                'from_name' => 'Frank',
                 'from_email' => 'frank@example.com',
                 'to_email' => 'henry@example.com',
             ],
             [
-                'from_name' => 'Grace Hopper',
+                'from_name' => 'Grace',
                 'from_email' => 'grace@example.com',
                 'to_email' => 'bob@example.com',
             ],
             [
-                'from_name' => 'Henry Ford',
+                'from_name' => 'Henry',
                 'from_email' => 'henry@example.com',
                 'to_email' => 'charlie@example.com',
             ],
