@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import Linkify from 'react-linkify';
-import styled, { keyframes } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import ChevronDownIcon from '@/assets/chevron-down.svg?react';
 import ChevronUpIcon from '@/assets/chevron-up.svg?react';
@@ -19,6 +19,13 @@ type GiftIdeasEditorProps = {
 const fadeIn = keyframes`
   from { opacity: 0 }
   to { opacity: 1 }
+`;
+
+const shake = keyframes`
+  0% { transform: translateX(0) }
+  25%, 75% { transform: translateX(5px) }
+  50% { transform: translateX(-5px) }
+  100% { transform: translateX(0) }
 `;
 
 const Container = styled.div`
@@ -107,7 +114,7 @@ const InputContainer = styled.div`
   gap: ${({ theme }) => theme.spacing.padding.s};
 `;
 
-const TextInput = styled.textarea<{ disabled?: boolean }>`
+const TextInput = styled.textarea<{ disabled?: boolean; $hasError?: boolean }>`
   font-family: ${({ theme }) => theme.typography.type};
   box-sizing: border-box;
   font-size: 1.2rem;
@@ -129,6 +136,11 @@ const TextInput = styled.textarea<{ disabled?: boolean }>`
     4px 4px 0 0;
   opacity: ${({ disabled }) => (disabled ? '0.5' : '1')};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'text')};
+  ${({ $hasError }) =>
+    $hasError &&
+    css`
+      animation: ${shake} 250ms ease;
+    `}
 `;
 
 const MaxMessage = styled.p`
@@ -152,6 +164,7 @@ export const GiftIdeasEditor = ({
   maxLength = 500,
 }: GiftIdeasEditorProps) => {
   const [newIdea, setNewIdea] = useState('');
+  const [hasError, setHasError] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { lock, unlock } = useBodyLock();
 
@@ -164,9 +177,18 @@ export const GiftIdeasEditor = ({
   };
 
   const handleAdd = () => {
-    if (newIdea.trim() && ideas.length < maxIdeas) {
+    if (!newIdea.trim()) {
+      setHasError(true);
+      setTimeout(() => {
+        setHasError(false);
+      }, 250);
+      return;
+    }
+
+    if (ideas.length < maxIdeas) {
       onChange([...ideas, newIdea.trim()]);
       setNewIdea('');
+      setHasError(false);
       setTimeout(() => {
         if (textareaRef.current) {
           textareaRef.current.style.height = 'auto';
@@ -270,6 +292,7 @@ export const GiftIdeasEditor = ({
             maxLength={maxLength}
             onFocus={lock}
             onBlur={unlock}
+            $hasError={hasError}
           />
           <Button onClick={handleAdd} title="Add" />
         </InputContainer>
