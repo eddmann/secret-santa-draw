@@ -19,6 +19,10 @@ class Allocation extends Model
         'to_user_id',
     ];
 
+    protected $casts = [
+        'from_ideas' => 'array',
+    ];
+
     public function draw(): BelongsTo
     {
         return $this->belongsTo(Draw::class);

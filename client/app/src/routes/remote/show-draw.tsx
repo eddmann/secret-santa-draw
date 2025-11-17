@@ -1,6 +1,5 @@
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useState } from 'react';
-import Linkify from 'react-linkify';
 import { useNavigate, useParams } from 'react-router-dom';
 import Snowfall from 'react-snowfall';
 import { toast } from 'react-toastify';
@@ -11,24 +10,16 @@ import ShareIcon from '@/assets/share.svg?react';
 import { BackIcon } from '@/components/BackIcon';
 import { Button } from '@/components/Button';
 import { Content } from '@/components/Content';
+import { GiftIdeasDisplay } from '@/components/GiftIdeasDisplay';
+import { GiftIdeasEditor } from '@/components/GiftIdeasEditor';
 import { Header } from '@/components/Header';
 import { List } from '@/components/List';
 import { Loading } from '@/components/Loading';
-import TextField from '@/components/TextField';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { remoteDrawsSelector } from '@/store/remoteDraws';
 import { fetchDraw, provideIdeas } from '@/store/remoteDraws/actions';
 import { userSelector } from '@/store/user';
 import { RemoteAllocation, RemoteDraw } from '@/types';
-
-const FromIdeas = styled.p`
-  white-space: pre-wrap;
-  word-break: break-word;
-
-  a {
-    color: ${({ theme }) => theme.colors.text};
-  }
-`;
 
 const Name = styled.div`
   font-size: ${({ theme }) => theme.typography.size.l};
@@ -53,6 +44,12 @@ const Result = styled.div`
   margin-bottom: 1rem;
 `;
 
+const IdeasSection = styled.div``;
+
+const SaveButton = styled(Button)`
+  margin-top: 1rem;
+`;
+
 const Description = styled.p`
   line-height: 1.25rem;
   padding: 1rem 1.2rem;
@@ -63,12 +60,24 @@ const Description = styled.p`
 const Allocation = ({
   allocation,
   onIdeasSave,
+  isRevealed,
+  onReveal,
 }: {
   allocation: RemoteAllocation;
-  onIdeasSave: (ideas: string) => void;
+  onIdeasSave: (ideas: string[]) => void;
+  isRevealed: boolean;
+  onReveal: () => void;
 }) => {
-  const [isRevealed, setIsRevealed] = useState(false);
   const [ideas, setIdeas] = useState(allocation.fromIdeas);
+
+  useEffect(() => {
+    setIdeas(allocation.fromIdeas);
+  }, [allocation.fromIdeas]);
+
+  const hasChanges = () => {
+    if (ideas.length !== allocation.fromIdeas.length) return true;
+    return ideas.some((idea, index) => idea !== allocation.fromIdeas[index]);
+  };
 
   return (
     <>
@@ -79,41 +88,29 @@ const Allocation = ({
           {isRevealed ? allocation.to : 'SECRET'}
         </RevealName>
       </Result>
-      {!isRevealed && (
-        <Button
-          title="Reveal"
-          variant="large"
-          onClick={() => {
-            setIsRevealed(true);
-          }}
-        />
-      )}
+      {!isRevealed && <Button title="Reveal" variant="large" onClick={onReveal} />}
       {isRevealed && (
         <>
           <div>
             <h3>Ideas from {allocation.to}...</h3>
-            <Linkify>
-              <FromIdeas>{allocation.toIdeas || `${allocation.to} has not provided any ideas yet.`}</FromIdeas>
-            </Linkify>
+            <GiftIdeasDisplay
+              ideas={allocation.toIdeas}
+              emptyMessage={`${allocation.to} has not provided any ideas yet.`}
+            />
           </div>
-          <div>
+          <IdeasSection>
             <h3>Ideas for your Secret Santa...</h3>
-            <TextField
-              value={ideas}
-              onChange={(event) => {
-                setIdeas(event.target.value);
-              }}
-              placeholder="Ideas"
-            />
-            <Button
-              style={{ marginTop: '1rem' }}
-              title="Save Ideas"
-              variant="large"
-              onClick={() => {
-                onIdeasSave(ideas);
-              }}
-            />
-          </div>
+            <GiftIdeasEditor ideas={ideas} onChange={setIdeas} disabled={!allocation.canProvideIdeas} />
+            {allocation.canProvideIdeas && hasChanges() && (
+              <SaveButton
+                title="Save Ideas"
+                variant="large"
+                onClick={() => {
+                  onIdeasSave(ideas);
+                }}
+              />
+            )}
+          </IdeasSection>
           <Snowfall />
         </>
       )}
@@ -155,12 +152,28 @@ const CollapseContent = styled.div<{ $isOpen: boolean }>`
   padding-right: 1.2rem;
 `;
 
+const AllocationsListWrapper = styled.div`
+  margin-top: 2rem;
+`;
+
+const RegisterPrompt = styled.div`
+  margin-top: 2rem;
+`;
+
+const RegisterButton = styled(Button)`
+  margin-top: 1rem;
+`;
+
 const AllocationsList = ({ id, allocations }: { id: RemoteDraw['id']; allocations: RemoteAllocation[] }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div style={{ marginTop: '2rem' }}>
-      <CollapseHeader onClick={() => setIsOpen(!isOpen)}>
+    <AllocationsListWrapper>
+      <CollapseHeader
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
+      >
         <CollapseText>Access a participants allocation</CollapseText>
         <Arrow $isOpen={isOpen}>▶</Arrow>
       </CollapseHeader>
@@ -187,7 +200,7 @@ const AllocationsList = ({ id, allocations }: { id: RemoteDraw['id']; allocation
           ))}
         </List>
       </CollapseContent>
-    </div>
+    </AllocationsListWrapper>
   );
 };
 
@@ -197,6 +210,7 @@ export const ShowRemoteDraw = () => {
   const navigate = useNavigate();
   const user = useAppSelector(userSelector);
   const { draw, isLoadingDraw } = useAppSelector(remoteDrawsSelector);
+  const [isRevealed, setIsRevealed] = useState(false);
 
   useEffect(() => {
     void dispatch(fetchDraw({ id }));
@@ -225,11 +239,21 @@ export const ShowRemoteDraw = () => {
         {draw.allocation && (
           <Allocation
             allocation={draw.allocation}
-            onIdeasSave={(ideas: string) => {
+            isRevealed={isRevealed}
+            onReveal={() => {
+              setIsRevealed(true);
+            }}
+            onIdeasSave={(ideas: string[]) => {
+              // Optimistically update the allocation in the component
+              // The backend sync happens in the background
               void dispatch(provideIdeas({ id, ideas }))
                 .then(unwrapResult)
                 .then(() => {
                   toast.success('Successfully provided ideas.');
+                })
+                .catch(() => {
+                  // Error is already handled in the action, just refetch to revert
+                  void dispatch(fetchDraw({ id }));
                 });
             }}
           />
@@ -238,17 +262,16 @@ export const ShowRemoteDraw = () => {
         {draw.allocations.length > 0 && <AllocationsList id={id} allocations={draw.allocations} />}
 
         {user.canRegister && (
-          <div style={{ marginTop: '2rem' }}>
+          <RegisterPrompt>
             <div>Want to conduct your own Secret Santa draw?</div>
-            <Button
-              style={{ marginTop: '1rem' }}
+            <RegisterButton
               title="Register"
               variant="large"
               onClick={() => {
                 navigate('/register');
               }}
             />
-          </div>
+          </RegisterPrompt>
         )}
       </Content>
     </>

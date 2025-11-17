@@ -251,19 +251,19 @@ test('provide ideas as the group owner', function () {
         ->actingAs($owner)
         ->put(
             $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
-            ['ideas' => $idea = 'Sample idea']
+            ['ideas' => $ideas = ['Sample idea 1', 'Sample idea 2', 'https://example.com/gift']]
         );
 
     $fromResponse = $this
         ->actingAs($owner)
         ->get($allocations['_embedded']['allocations'][0]['_links']['self']['href']);
-    $fromResponse->assertJson(['from' => ['ideas' => $idea]]);
+    $fromResponse->assertJson(['from' => ['ideas' => $ideas]]);
 
     $toAllocation = collect($allocations['_embedded']['allocations'])->firstWhere('to.name', $allocations['_embedded']['allocations'][0]['from']['name']);
     $toResponse = $this
         ->actingAs($owner)
         ->get($toAllocation['_links']['self']['href']);
-    $toResponse->assertJson(['to' => ['ideas' => $idea]]);
+    $toResponse->assertJson(['to' => ['ideas' => $ideas]]);
 });
 
 test('provide ideas as the authenticated user', function () {
@@ -296,19 +296,19 @@ test('provide ideas as the authenticated user', function () {
         ->actingAs($participant)
         ->put(
             $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
-            ['ideas' => $idea = 'Sample idea']
+            ['ideas' => $ideas = ['Sample idea']]
         );
 
     $fromResponse = $this
         ->actingAs($participant)
         ->get($allocations['_embedded']['allocations'][0]['_links']['self']['href']);
-    $fromResponse->assertJson(['from' => ['ideas' => $idea]]);
+    $fromResponse->assertJson(['from' => ['ideas' => $ideas]]);
 
     $toAllocation = collect($allocations['_embedded']['allocations'])->firstWhere('to.name', $allocations['_embedded']['allocations'][0]['from']['name']);
     $toResponse = $this
         ->actingAs($owner)
         ->get($toAllocation['_links']['self']['href']);
-    $toResponse->assertJson(['to' => ['ideas' => $idea]]);
+    $toResponse->assertJson(['to' => ['ideas' => $ideas]]);
 });
 
 test('provide ideas using an access token', function () {
@@ -342,20 +342,20 @@ test('provide ideas using an access token', function () {
     $this
         ->put(
             $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
-            ['ideas' => $idea = 'Sample idea'],
+            ['ideas' => $ideas = ['Sample idea']],
             ['X-Access-Token' => $allocations['_embedded']['allocations'][0]['from']['access_token']]
         );
 
     $fromResponse = $this
         ->actingAs($participant)
         ->get($allocations['_embedded']['allocations'][0]['_links']['self']['href']);
-    $fromResponse->assertJson(['from' => ['ideas' => $idea]]);
+    $fromResponse->assertJson(['from' => ['ideas' => $ideas]]);
 
     $toAllocation = collect($allocations['_embedded']['allocations'])->firstWhere('to.name', $allocations['_embedded']['allocations'][0]['from']['name']);
     $toResponse = $this
         ->actingAs($owner)
         ->get($toAllocation['_links']['self']['href']);
-    $toResponse->assertJson(['to' => ['ideas' => $idea]]);
+    $toResponse->assertJson(['to' => ['ideas' => $ideas]]);
 });
 
 test('fails to provide ideas as a guest', function () {
@@ -383,7 +383,7 @@ test('fails to provide ideas as a guest', function () {
     $response = $this
         ->put(
             $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
-            ['ideas' => 'Sample idea'],
+            ['ideas' => ['Sample idea']],
         );
 
     $response->assertForbidden();
@@ -415,8 +415,149 @@ test('fails to provide ideas using a different authenticated user', function () 
         ->actingAs($anotherUser)
         ->put(
             $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
-            ['ideas' => 'Sample idea'],
+            ['ideas' => ['Sample idea']],
         );
 
     $response->assertForbidden();
+});
+
+test('can provide an empty array of ideas', function () {
+    $owner = User::factory()->createOne();
+
+    $group = $this
+        ->actingAs($owner)
+        ->post('/api/groups', [
+            'title' => 'Test Title',
+        ]);
+
+    $draw = $this
+        ->actingAs($owner)
+        ->post($group['_links']['conduct-draw']['href'], [
+            'description' => 'Sample description',
+            'participants' => $this->participants(),
+        ]);
+
+    $allocations = $this
+        ->actingAs($owner)
+        ->get($draw['_links']['allocations']['href']);
+
+    $response = $this
+        ->actingAs($owner)
+        ->put(
+            $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
+            ['ideas' => []]
+        );
+
+    $response->assertAccepted();
+
+    $fromResponse = $this
+        ->actingAs($owner)
+        ->get($allocations['_embedded']['allocations'][0]['_links']['self']['href']);
+    $fromResponse->assertJson(['from' => ['ideas' => []]]);
+});
+
+test('can provide ideas without the ideas field', function () {
+    $owner = User::factory()->createOne();
+
+    $group = $this
+        ->actingAs($owner)
+        ->post('/api/groups', [
+            'title' => 'Test Title',
+        ]);
+
+    $draw = $this
+        ->actingAs($owner)
+        ->post($group['_links']['conduct-draw']['href'], [
+            'description' => 'Sample description',
+            'participants' => $this->participants(),
+        ]);
+
+    $allocations = $this
+        ->actingAs($owner)
+        ->get($draw['_links']['allocations']['href']);
+
+    $response = $this
+        ->actingAs($owner)
+        ->put(
+            $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
+            []
+        );
+
+    $response->assertAccepted();
+
+    $fromResponse = $this
+        ->actingAs($owner)
+        ->get($allocations['_embedded']['allocations'][0]['_links']['self']['href']);
+    $fromResponse->assertJson(['from' => ['ideas' => []]]);
+});
+
+test('fails to provide more than 5 ideas', function () {
+    $owner = User::factory()->createOne();
+
+    $group = $this
+        ->actingAs($owner)
+        ->post('/api/groups', [
+            'title' => 'Test Title',
+        ]);
+
+    $draw = $this
+        ->actingAs($owner)
+        ->post($group['_links']['conduct-draw']['href'], [
+            'description' => 'Sample description',
+            'participants' => $this->participants(),
+        ]);
+
+    $allocations = $this
+        ->actingAs($owner)
+        ->get($draw['_links']['allocations']['href']);
+
+    $response = $this
+        ->actingAs($owner)
+        ->put(
+            $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
+            ['ideas' => [
+                'Idea 1',
+                'Idea 2',
+                'Idea 3',
+                'Idea 4',
+                'Idea 5',
+                'Idea 6',  // Exceeds max of 5
+            ]]
+        );
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors('ideas');
+});
+
+test('fails when individual idea exceeds 500 characters', function () {
+    $owner = User::factory()->createOne();
+
+    $group = $this
+        ->actingAs($owner)
+        ->post('/api/groups', [
+            'title' => 'Test Title',
+        ]);
+
+    $draw = $this
+        ->actingAs($owner)
+        ->post($group['_links']['conduct-draw']['href'], [
+            'description' => 'Sample description',
+            'participants' => $this->participants(),
+        ]);
+
+    $allocations = $this
+        ->actingAs($owner)
+        ->get($draw['_links']['allocations']['href']);
+
+    $response = $this
+        ->actingAs($owner)
+        ->put(
+            $allocations['_embedded']['allocations'][0]['_links']['provide-ideas']['href'],
+            ['ideas' => [
+                str_repeat('a', 501),  // Exceeds max of 500 characters
+            ]]
+        );
+
+    $response->assertStatus(422);
+    $response->assertJsonValidationErrors('ideas.0');
 });

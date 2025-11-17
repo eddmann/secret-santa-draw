@@ -68,10 +68,15 @@ export const removeDraw = createAsyncThunk(
 
 export const provideIdeas = createAsyncThunk(
   'remoteDraws/provideIdeas',
-  async ({ id, ideas }: { id: RemoteDraw['id']; ideas: string }) => {
+  async ({ id, ideas }: { id: RemoteDraw['id']; ideas: string[] }, { dispatch }) => {
     try {
       const action = await client.go(atob(id)).follow('allocation').follow('provide-ideas');
       await action.put({ data: { ideas } });
+
+      // Clear the cache for the draw and allocation to ensure fresh data
+      client.clearResourceCache([atob(id)], []);
+
+      await dispatch(fetchDraw({ id }));
     } catch (error) {
       await notifyAndThrowErrorMessage(error, 'Failed to provide ideas.');
     }

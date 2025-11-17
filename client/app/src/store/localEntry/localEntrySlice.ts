@@ -30,8 +30,8 @@ export const localEntrySlice = createSlice({
             ? exclusions
             : {
                 ...exclusions,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                [participant]: state.exclusions[participant]!.filter((excluded) => excluded !== participant),
+
+                [participant]: state.exclusions[participant].filter((excluded) => excluded !== participant),
               },
         {},
       );

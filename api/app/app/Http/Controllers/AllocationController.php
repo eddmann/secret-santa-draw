@@ -37,11 +37,12 @@ class AllocationController
         }
 
         $request->validate([
-            'ideas' => 'max:2000',
+            'ideas' => 'nullable|array|max:5',
+            'ideas.*' => 'string|max:500',
         ]);
 
         $allocation->update([
-            'from_ideas' => (string) $request->ideas,
+            'from_ideas' => $request->ideas ?? [],
         ]);
 
         return response(status: Response::HTTP_ACCEPTED);

@@ -37,8 +37,8 @@ export const remoteEntrySlice = createSlice({
             ? exclusions
             : {
                 ...exclusions,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                [participantEmail]: state.exclusions[participantEmail]!.filter(
+
+                [participantEmail]: state.exclusions[participantEmail].filter(
                   (excludedEmail) => excludedEmail !== participantEmail,
                 ),
               },
