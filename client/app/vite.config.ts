@@ -19,7 +19,7 @@ export default defineConfig({
   plugins: [
     react(),
     svgr(),
-    basicSSL(),
+    // basicSSL(),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
