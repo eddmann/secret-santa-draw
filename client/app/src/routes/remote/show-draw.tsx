@@ -121,31 +121,72 @@ const Allocation = ({
   );
 };
 
+const CollapseHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.25rem;
+  padding: 1rem 1.2rem;
+  border-radius: 1rem;
+  background-color: #aa0425;
+
+  &:hover {
+    opacity: 0.85;
+  }
+`;
+
+const CollapseText = styled.span`
+  flex: 1;
+`;
+
+const Arrow = styled.span<{ $isOpen: boolean }>`
+  display: inline-block;
+  font-size: 0.8rem;
+  transform: ${({ $isOpen }) => ($isOpen ? 'rotate(90deg)' : 'rotate(0deg)')};
+  margin-left: ${({ theme }) => theme.spacing.padding.s};
+`;
+
+const CollapseContent = styled.div<{ $isOpen: boolean }>`
+  display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
+  margin-top: ${({ $isOpen }) => ($isOpen ? '1rem' : '0')};
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+`;
+
 const AllocationsList = ({ id, allocations }: { id: RemoteDraw['id']; allocations: RemoteAllocation[] }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div>
-      <p>Access a participants allocation below:</p>
-      <List>
-        {allocations.map((allocation) => (
-          <List.Item key={allocation.id}>
-            <List.Title
-              to=""
-              onClick={() => {
-                window.location.href = `/remote/draws/${id}?token=${allocation.token}`;
-              }}
-            >
-              {allocation.from}
-            </List.Title>
-            <Button
-              icon={<ShareIcon />}
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.href = `/remote/draws/${id}?token=${allocation.token}`;
-              }}
-            />
-          </List.Item>
-        ))}
-      </List>
+    <div style={{ marginTop: '2rem' }}>
+      <CollapseHeader onClick={() => setIsOpen(!isOpen)}>
+        <CollapseText>Access a participants allocation</CollapseText>
+        <Arrow $isOpen={isOpen}>▶</Arrow>
+      </CollapseHeader>
+      <CollapseContent $isOpen={isOpen}>
+        <List>
+          {allocations.map((allocation) => (
+            <List.Item key={allocation.id}>
+              <List.Title
+                to=""
+                onClick={() => {
+                  window.location.href = `/remote/draws/${id}?token=${allocation.token}`;
+                }}
+              >
+                {allocation.from}
+              </List.Title>
+              <Button
+                icon={<ShareIcon />}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = `/remote/draws/${id}?token=${allocation.token}`;
+                }}
+              />
+            </List.Item>
+          ))}
+        </List>
+      </CollapseContent>
     </div>
   );
 };
