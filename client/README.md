@@ -17,7 +17,7 @@ Testing/Linting
   format                Fix style related code violations
 
 Running Instance
-  open                  Open the API in the default browser
+  open                  Open the Client in the default browser
   shell                 Access a shell of the development environment
 
 Build/Deploy

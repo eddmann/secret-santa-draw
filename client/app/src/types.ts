@@ -37,8 +37,8 @@ export type RemoteAllocation = {
   id: string;
   from: string;
   to: string;
-  fromIdeas: string;
-  toIdeas: string;
+  fromIdeas: string[];
+  toIdeas: string[];
   token: string;
   canProvideIdeas: boolean;
 };
@@ -57,12 +57,12 @@ export type RemoteEntry = {
 export type AllocationResource = {
   from: {
     name: string;
-    ideas: string;
+    ideas: string[];
     access_token: string;
   };
   to: {
     name: string;
-    ideas: string;
+    ideas: string[];
   };
 };
 

@@ -4,7 +4,7 @@
 
 [API](./api/) | [Client](./client/) | [iOS](./ios/)
 
-This year's offering expands upon last year's [PWA](https://github.com/eddmann/secret-santa-pwa), transforming it into a full-fledged platform complete with an accompanying iOS/Android application (coming soon).
+This year's offering expands upon last year's [PWA](https://github.com/eddmann/secret-santa-pwa), transforming it into a full-fledged platform complete with an accompanying iOS application.
 It brings holiday cheer by making Secret Santa draws a breeze to organise, whether gathered around the tree or connected online! 🎄
 
 The service was built in a RAD manner, with a self-imposed time constraint of just a couple of evenings for development - driven by the goal of getting something shipped! 🚀

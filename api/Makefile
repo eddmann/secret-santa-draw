@@ -12,6 +12,8 @@ start: up composer db ## Start the application in development mode
 restart: stop start ## Restart the application in development mode
 
 up:
+	[ -f docker/dev.env ] || cp docker/dev.env.example docker/dev.env
+	cp app/.env.example app/.env
 	$(COMPOSE) up -d --build --force-recreate
 
 stop: ## Stop the application and clean up

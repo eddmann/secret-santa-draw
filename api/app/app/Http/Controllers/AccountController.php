@@ -32,7 +32,7 @@ class AccountController
             $participant->update(['to_user_id' => $user->id]);
         }
 
-        Auth::login($user);
+        Auth::guard('web')->login($user);
 
         $request->session()->regenerate();
 

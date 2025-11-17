@@ -26,11 +26,13 @@ class AllocationResource extends JsonResource
                 ],
             ],
             'from' => [
+                'id' => $this->from_user_id,
                 'name' => $this->from_name,
                 'ideas' => $this->from_ideas,
                 'access_token' => $this->from_access_token,
             ],
             'to' => [
+                'id' => $this->to_user_id,
                 'name' => $this->to_name,
                 'ideas' => $this->to_ideas,
             ],

@@ -117,7 +117,9 @@ export const ConductRemoteDrawParticipants = () => {
         }}
       />
       <Content>
-        <Description>Describe your 2024 draw (budget, themes etc.), and who is participating in it.</Description>
+        <Description>
+          Describe your {new Date().getFullYear()} draw (budget, themes etc.), and who is participating in it.
+        </Description>
 
         <TextField
           value={remoteEntry.description}
