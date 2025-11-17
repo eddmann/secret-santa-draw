@@ -37,7 +37,6 @@ export const remoteEntrySlice = createSlice({
             ? exclusions
             : {
                 ...exclusions,
-
                 [participantEmail]: state.exclusions[participantEmail].filter(
                   (excludedEmail) => excludedEmail !== participantEmail,
                 ),

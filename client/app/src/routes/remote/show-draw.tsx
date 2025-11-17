@@ -265,15 +265,12 @@ export const ShowRemoteDraw = () => {
               setIsRevealed(true);
             }}
             onIdeasSave={(ideas: string[]) => {
-              // Optimistically update the allocation in the component
-              // The backend sync happens in the background
               void dispatch(provideIdeas({ id, ideas }))
                 .then(unwrapResult)
                 .then(() => {
                   toast.success('Successfully provided ideas.');
                 })
                 .catch(() => {
-                  // Error is already handled in the action, just refetch to revert
                   void dispatch(fetchDraw({ id }));
                 });
             }}

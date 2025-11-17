@@ -30,7 +30,6 @@ export const localEntrySlice = createSlice({
             ? exclusions
             : {
                 ...exclusions,
-
                 [participant]: state.exclusions[participant].filter((excluded) => excluded !== participant),
               },
         {},

@@ -70,11 +70,12 @@ export const provideIdeas = createAsyncThunk(
   'remoteDraws/provideIdeas',
   async ({ id, ideas }: { id: RemoteDraw['id']; ideas: string[] }, { dispatch }) => {
     try {
-      const action = await client.go(atob(id)).follow('allocation').follow('provide-ideas');
+      const allocationResource = await client.go(atob(id)).follow('allocation');
+      const action = await allocationResource.follow('provide-ideas');
       await action.put({ data: { ideas } });
 
-      // Clear the cache for the draw and allocation to ensure fresh data
-      client.clearResourceCache([atob(id)], []);
+      // Clear only the allocation resource cache since that's what changed
+      client.clearResourceCache([allocationResource.uri], []);
 
       await dispatch(fetchDraw({ id }));
     } catch (error) {
