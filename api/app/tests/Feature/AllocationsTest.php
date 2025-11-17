@@ -33,8 +33,6 @@ test('list allocations for a draw as the owner', function () {
 });
 
 test('associates previous draw allocations when user email is registered', function () {
-    $this->markTestSkipped();
-
     $owner = User::factory()->createOne();
 
     $group = $this
@@ -44,13 +42,19 @@ test('associates previous draw allocations when user email is registered', funct
         ]);
 
     $draw = $this
+        ->actingAs($owner)
         ->post($group['_links']['conduct-draw']['href'], [
             'description' => 'Sample description',
             'participants' => $this->participants(),
         ]);
-    $drawAllocations = $draw['_embedded']['allocations']['_embedded']['allocations'];
+
+    $allocationsResponse = $this
+        ->actingAs($owner)
+        ->get($draw['_links']['allocations']['href']);
+    $drawAllocations = $allocationsResponse['_embedded']['allocations'];
 
     $participantName = $this->participants()[0]['name'];
+    $participantEmail = $this->participants()[0]['email'];
 
     $fromAllocation = collect($drawAllocations)->firstWhere('from.name', $participantName);
     $toAllocation = collect($drawAllocations)->firstWhere('to.name', $participantName);
@@ -59,18 +63,19 @@ test('associates previous draw allocations when user email is registered', funct
 
     $this->post('/api/register', [
         'name' => 'Test User',
-        'email' => $participantName,
+        'email' => $participantEmail,
         'password' => 'password',
     ]);
 
-    $updatedDraw = $this
+    $updatedAllocationsResponse = $this
         ->actingAs($owner)
         ->get($draw['_links']['allocations']['href']);
-    $updatedDrawAllocations = $updatedDraw['_embedded']['allocations']['_embedded']['allocations'];
+    $updatedAllocationsResponse->assertOk();
+    $updatedDrawAllocations = $updatedAllocationsResponse['_embedded']['allocations'];
 
     $fromAllocation = collect($updatedDrawAllocations)->firstWhere('from.name', $participantName);
     $toAllocation = collect($updatedDrawAllocations)->firstWhere('to.name', $participantName);
-    $participant = User::findByEmail($participantName);
+    $participant = User::findByEmail($participantEmail);
     assertEquals($participant->id, $fromAllocation['from']['id']);
     assertEquals($participant->id, $toAllocation['to']['id']);
 });
