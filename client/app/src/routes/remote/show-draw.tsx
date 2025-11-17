@@ -44,8 +44,6 @@ const Result = styled.div`
   margin-bottom: 1rem;
 `;
 
-const IdeasSection = styled.div``;
-
 const SaveButton = styled(Button)`
   margin-top: 1rem;
 `;
@@ -55,6 +53,27 @@ const Description = styled.p`
   padding: 1rem 1.2rem;
   border-radius: 1rem;
   background-color: #aa0425;
+`;
+
+const GiftIdeasContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.padding.l};
+  margin-top: ${({ theme }) => theme.spacing.padding.l};
+  width: 100%;
+  max-width: 100%;
+`;
+
+const GiftIdeaCard = styled.div`
+  background: rgb(170 4 37 / 60%);
+  border: 2px solid #000;
+  border-radius: 0.5rem;
+  padding: ${({ theme }) => theme.spacing.padding.l};
+  box-shadow: 3px 3px 0 0 rgb(0 0 0 / 20%);
+`;
+
+const SectionHeader = styled.h3`
+  margin: 0 0 ${({ theme }) => theme.spacing.padding.m} 0;
 `;
 
 const Allocation = ({
@@ -91,26 +110,28 @@ const Allocation = ({
       {!isRevealed && <Button title="Reveal" variant="large" onClick={onReveal} />}
       {isRevealed && (
         <>
-          <div>
-            <h3>Ideas from {allocation.to}...</h3>
-            <GiftIdeasDisplay
-              ideas={allocation.toIdeas}
-              emptyMessage={`${allocation.to} has not provided any ideas yet.`}
-            />
-          </div>
-          <IdeasSection>
-            <h3>Ideas for your Secret Santa...</h3>
-            <GiftIdeasEditor ideas={ideas} onChange={setIdeas} disabled={!allocation.canProvideIdeas} />
-            {allocation.canProvideIdeas && hasChanges() && (
-              <SaveButton
-                title="Save Ideas"
-                variant="large"
-                onClick={() => {
-                  onIdeasSave(ideas);
-                }}
+          <GiftIdeasContainer>
+            <GiftIdeaCard>
+              <SectionHeader>Ideas from {allocation.to}...</SectionHeader>
+              <GiftIdeasDisplay
+                ideas={allocation.toIdeas}
+                emptyMessage={`${allocation.to} has not provided any ideas yet.`}
               />
-            )}
-          </IdeasSection>
+            </GiftIdeaCard>
+            <GiftIdeaCard>
+              <SectionHeader>Ideas for your Secret Santa...</SectionHeader>
+              <GiftIdeasEditor ideas={ideas} onChange={setIdeas} disabled={!allocation.canProvideIdeas} />
+              {allocation.canProvideIdeas && hasChanges() && (
+                <SaveButton
+                  title="Save Ideas"
+                  variant="large"
+                  onClick={() => {
+                    onIdeasSave(ideas);
+                  }}
+                />
+              )}
+            </GiftIdeaCard>
+          </GiftIdeasContainer>
           <Snowfall />
         </>
       )}
