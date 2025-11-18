@@ -36,7 +36,6 @@ class OfficeGroupSeeder extends Seeder
                     'Socks',
                     'Coffee subscription',
                     'This smart mug is amazing: https://example.com/coffee-grinder-burr-type',
-                    'A nice pen',
                 ],
             ],
             [
@@ -71,7 +70,6 @@ class OfficeGroupSeeder extends Seeder
                     "Noise-canceling headphones or earbuds - does a lot of video calls from home and the background noise can be distracting\nWould appreciate good audio quality for both calls and music\nOver-ear preferred but good in-ear buds would work too\nBudget flexible up to $250",
                     'https://example.com/hiking-backpack-20l-with-hydration-bladder-compatibility',
                     'Gloves',
-                    'Running shoes gift card or store credit - size 9.5 mens',
                 ],
             ],
             [
@@ -84,7 +82,6 @@ class OfficeGroupSeeder extends Seeder
                     'Blanket',
                     'Essential oils like https://example.com/lavender-essential-oil are always appreciated',
                     'Scented candles - loves vanilla, lavender, or eucalyptus scents',
-                    'A cozy reading nook setup would be amazing - thinking soft throw blanket, book light (maybe something like https://example.com/rechargeable-book-light), maybe a small side table or book stand. Loves to read before bed and wants to create a dedicated space for it. Aesthetic is modern minimal with warm wood tones.',
                 ],
             ],
         ];
