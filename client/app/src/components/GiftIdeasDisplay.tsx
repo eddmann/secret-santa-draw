@@ -29,6 +29,17 @@ const IdeaItem = styled.div`
   display: flex;
   align-items: flex-start;
   gap: ${({ theme }) => theme.spacing.padding.m};
+  padding-bottom: ${({ theme }) => theme.spacing.padding.m};
+  border-bottom: 1px solid rgba(0 0 0 / 15%);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  @media (width <= 768px) {
+    flex-wrap: wrap;
+  }
 `;
 
 const Number = styled.div`
@@ -40,6 +51,10 @@ const Number = styled.div`
   height: 1rem;
   text-align: center;
   flex-shrink: 0;
+
+  @media (width <= 768px) {
+    display: none;
+  }
 `;
 
 const IdeaText = styled.div`
@@ -51,6 +66,10 @@ const IdeaText = styled.div`
   a {
     color: ${({ theme }) => theme.colors.text};
     text-decoration: underline;
+  }
+
+  @media (width <= 768px) {
+    flex-basis: 100%;
   }
 `;
 
