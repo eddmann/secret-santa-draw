@@ -52,7 +52,7 @@ class Group extends Model
                 'from_email' => $from['email'],
                 'from_user_id' => User::findByEmail($from['email'])?->id,
                 'from_access_token' => Str::random(64),
-                'from_ideas' => '',
+                'from_ideas' => [],
                 'to_email' => $to['email'],
                 'to_user_id' => User::findByEmail($to['email'])?->id,
             ]);
