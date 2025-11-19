@@ -19,6 +19,8 @@ export const fetchDraw = createAsyncThunk('remoteDraws/fetch', async ({ id }: { 
         fromIdeas: state.data.from.ideas,
         toIdeas: state.data.to.ideas,
         canProvideIdeas: state.links.has('provide-ideas'),
+        hasMessagesToRecipient: state.links.has('messages-to-recipient'),
+        hasMessagesFromSanta: state.links.has('messages-from-santa'),
         token: state.data.from.access_token,
       });
     }
@@ -34,6 +36,8 @@ export const fetchDraw = createAsyncThunk('remoteDraws/fetch', async ({ id }: { 
       fromIdeas: state.data.from.ideas,
       toIdeas: state.data.to.ideas,
       canProvideIdeas: state.links.has('provide-ideas'),
+      hasMessagesToRecipient: state.links.has('messages-to-recipient'),
+      hasMessagesFromSanta: state.links.has('messages-from-santa'),
       token: state.data.from.access_token,
     };
   }

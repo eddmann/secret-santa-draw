@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import { LocalDraw } from '@/types';
 
+import { allocationMessagesSlice } from './allocationMessages';
 import { localDrawsSlice } from './localDraws';
 import { localEntrySlice } from './localEntry';
 import { remoteDrawsSlice } from './remoteDraws';
@@ -32,6 +33,7 @@ export const store = configureStore({
     remoteGroups: remoteGroupsSlice.reducer,
     remoteEntry: remoteEntrySlice.reducer,
     remoteDraws: remoteDrawsSlice.reducer,
+    allocationMessages: allocationMessagesSlice.reducer,
   },
   preloadedState,
 });

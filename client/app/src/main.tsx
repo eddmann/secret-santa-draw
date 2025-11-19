@@ -22,6 +22,7 @@ import { AddRemoteGroup } from './routes/remote/add-group';
 import { ConductRemoteDrawExclusions } from './routes/remote/conduct-draw-exclusions';
 import { ConductRemoteDrawParticipants } from './routes/remote/conduct-draw-participants';
 import { ListRemoteGroups } from './routes/remote/list-groups';
+import { MessageConversation } from './routes/remote/message-conversation';
 import { ShowRemoteDraw } from './routes/remote/show-draw';
 import { ShowRemoteGroup } from './routes/remote/show-group';
 import { store } from './store';
@@ -70,6 +71,14 @@ const router = createBrowserRouter([
       {
         path: 'remote/draws/:id',
         element: <ShowRemoteDraw />,
+      },
+      {
+        path: 'remote/draws/:id/messages/to-recipient',
+        element: <MessageConversation direction="to-recipient" />,
+      },
+      {
+        path: 'remote/draws/:id/messages/from-santa',
+        element: <MessageConversation direction="from-santa" />,
       },
       {
         path: 'local',

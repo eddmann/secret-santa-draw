@@ -1,17 +1,36 @@
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Snowfall from 'react-snowfall';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
+const setCookie = (name: string, value: string, days: number) => {
+  const date = new Date();
+  date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+  const expires = `expires=${date.toUTCString()}`;
+  document.cookie = `${name}=${value};${expires};path=/`;
+};
+
+const getCookie = (name: string): string | null => {
+  const nameEQ = `${name}=`;
+  const cookies = document.cookie.split(';');
+  for (const cookieItem of cookies) {
+    let cookie = cookieItem;
+    while (cookie.startsWith(' ')) cookie = cookie.substring(1, cookie.length);
+    if (cookie.startsWith(nameEQ)) return cookie.substring(nameEQ.length, cookie.length);
+  }
+  return null;
+};
+
 import HomeIcon from '@/assets/home.svg?react';
+import MessageIcon from '@/assets/message.svg?react';
 import ShareIcon from '@/assets/share.svg?react';
 import { BackIcon } from '@/components/BackIcon';
 import { Button } from '@/components/Button';
 import { Content } from '@/components/Content';
 import { GiftIdeasDisplay } from '@/components/GiftIdeasDisplay';
-import { GiftIdeasEditor } from '@/components/GiftIdeasEditor';
+import { GiftIdeasEditor, GiftIdeasEditorRef } from '@/components/GiftIdeasEditor';
 import { Header } from '@/components/Header';
 import { List } from '@/components/List';
 import { Loading } from '@/components/Loading';
@@ -46,6 +65,15 @@ const Result = styled.div`
 
 const SaveButton = styled(Button)`
   margin-top: 1rem;
+
+  @media (width <= 768px) {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+    z-index: 1000;
+  }
 `;
 
 const Description = styled.p`
@@ -72,8 +100,15 @@ const GiftIdeaCard = styled.div`
   box-shadow: 3px 3px 0 0 rgb(0 0 0 / 20%);
 `;
 
-const SectionHeader = styled.h3`
+const SectionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 0 0 ${({ theme }) => theme.spacing.padding.m} 0;
+`;
+
+const SectionTitle = styled.h3`
+  margin: 0;
 `;
 
 const Allocation = ({
@@ -81,13 +116,16 @@ const Allocation = ({
   onIdeasSave,
   isRevealed,
   onReveal,
+  onMessageClick,
 }: {
   allocation: RemoteAllocation;
   onIdeasSave: (ideas: string[]) => void;
   isRevealed: boolean;
   onReveal: () => void;
+  onMessageClick: (direction: 'to-recipient' | 'from-santa') => void;
 }) => {
   const [ideas, setIdeas] = useState(allocation.fromIdeas);
+  const editorRef = useRef<GiftIdeasEditorRef>(null);
 
   useEffect(() => {
     setIdeas(allocation.fromIdeas);
@@ -96,6 +134,13 @@ const Allocation = ({
   const hasChanges = () => {
     if (ideas.length !== allocation.fromIdeas.length) return true;
     return ideas.some((idea, index) => idea !== allocation.fromIdeas[index]);
+  };
+
+  const handleSave = () => {
+    if (!editorRef.current?.validateBeforeSave()) {
+      return;
+    }
+    onIdeasSave(ideas);
   };
 
   return (
@@ -112,23 +157,42 @@ const Allocation = ({
         <>
           <GiftIdeasContainer>
             <GiftIdeaCard>
-              <SectionHeader>Ideas from {allocation.to}...</SectionHeader>
+              <SectionHeader>
+                <SectionTitle>Ideas from {allocation.to}...</SectionTitle>
+                {allocation.hasMessagesToRecipient && (
+                  <Button
+                    icon={<MessageIcon />}
+                    onClick={() => {
+                      onMessageClick('to-recipient');
+                    }}
+                  />
+                )}
+              </SectionHeader>
               <GiftIdeasDisplay
                 ideas={allocation.toIdeas}
                 emptyMessage={`${allocation.to} has not provided any ideas yet.`}
               />
             </GiftIdeaCard>
             <GiftIdeaCard>
-              <SectionHeader>Ideas for your Secret Santa...</SectionHeader>
-              <GiftIdeasEditor ideas={ideas} onChange={setIdeas} disabled={!allocation.canProvideIdeas} />
+              <SectionHeader>
+                <SectionTitle>Ideas for Secret Santa...</SectionTitle>
+                {allocation.hasMessagesFromSanta && (
+                  <Button
+                    icon={<MessageIcon />}
+                    onClick={() => {
+                      onMessageClick('from-santa');
+                    }}
+                  />
+                )}
+              </SectionHeader>
+              <GiftIdeasEditor
+                ref={editorRef}
+                ideas={ideas}
+                onChange={setIdeas}
+                disabled={!allocation.canProvideIdeas}
+              />
               {allocation.canProvideIdeas && hasChanges() && (
-                <SaveButton
-                  title="Save Ideas"
-                  variant="large"
-                  onClick={() => {
-                    onIdeasSave(ideas);
-                  }}
-                />
+                <SaveButton title="Save Ideas" variant="large" onClick={handleSave} />
               )}
             </GiftIdeaCard>
           </GiftIdeasContainer>
@@ -227,11 +291,14 @@ const AllocationsList = ({ id, allocations }: { id: RemoteDraw['id']; allocation
 
 export const ShowRemoteDraw = () => {
   const { id = '' } = useParams();
+  const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector(userSelector);
   const { draw, isLoadingDraw } = useAppSelector(remoteDrawsSelector);
-  const [isRevealed, setIsRevealed] = useState(false);
+  const accessToken = searchParams.get('token');
+  const cookieName = `reveal_${id}_${accessToken ?? 'default'}`;
+  const [isRevealed, setIsRevealed] = useState(getCookie(cookieName) === 'true');
 
   useEffect(() => {
     void dispatch(fetchDraw({ id }));
@@ -263,6 +330,7 @@ export const ShowRemoteDraw = () => {
             isRevealed={isRevealed}
             onReveal={() => {
               setIsRevealed(true);
+              setCookie(cookieName, 'true', 1);
             }}
             onIdeasSave={(ideas: string[]) => {
               void dispatch(provideIdeas({ id, ideas }))
@@ -273,6 +341,14 @@ export const ShowRemoteDraw = () => {
                 .catch(() => {
                   void dispatch(fetchDraw({ id }));
                 });
+            }}
+            onMessageClick={(direction) => {
+              const path = `/remote/draws/${id}/messages/${direction}`;
+              if (accessToken) {
+                navigate(`${path}?token=${accessToken}`);
+              } else {
+                navigate(path);
+              }
             }}
           />
         )}

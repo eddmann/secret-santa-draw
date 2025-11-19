@@ -41,6 +41,8 @@ export type RemoteAllocation = {
   toIdeas: string[];
   token: string;
   canProvideIdeas: boolean;
+  hasMessagesToRecipient: boolean;
+  hasMessagesFromSanta: boolean;
 };
 
 export type RemoteParticipant = {
@@ -74,4 +76,26 @@ export type DrawResource = {
 
 export type GroupResource = {
   title: string;
+};
+
+export type AllocationMessage = {
+  id: string;
+  message: string;
+  fromMe: boolean;
+  createdAt: string;
+};
+
+export type AllocationMessageResource = {
+  id: string;
+  message: string;
+  is_from_me: boolean;
+  created_at: string;
+};
+
+export type AllocationMessageDirection = 'to-recipient' | 'from-santa';
+
+export type AllocationMessagesResource = {
+  participant_name: string;
+  conversation_type: AllocationMessageDirection;
+  total: number;
 };
