@@ -47,8 +47,19 @@ test('send a message to recipient as authenticated Secret Santa user', function 
         'is_from_me' => true,
     ]);
 
-    $recipientEmailAddress = Allocation::where('from_email', $santa->email)->value('to_email');
-    Mail::assertQueued(AllocationMessageReceived::class, fn ($mail) => $mail->hasTo($recipientEmailAddress));
+    $santaAllocation = Allocation::where('from_email', $santa->email)->first();
+    $recipientEmailAddress = $santaAllocation->to_email;
+    $recipientName = Allocation::where('from_email', $recipientEmailAddress)->value('from_name');
+    $recipientToken = Allocation::where('from_email', $recipientEmailAddress)->value('from_access_token');
+
+    Mail::assertQueued(AllocationMessageReceived::class, function ($mail) use ($recipientEmailAddress, $recipientName, $recipientToken) {
+        $content = $mail->content();
+        $emailText = $content->htmlString;
+
+        return $mail->hasTo($recipientEmailAddress) &&
+               str_contains($emailText, "Hey {$recipientName},") &&
+               str_contains($emailText, "token={$recipientToken}");
+    });
 });
 
 test('send a message to Secret Santa as authenticated recipient user', function () {
@@ -93,8 +104,19 @@ test('send a message to Secret Santa as authenticated recipient user', function 
         'is_from_me' => true,
     ]);
 
-    $secretSantaEmailAddress = Allocation::where('to_email', $recipient->email)->value('from_email');
-    Mail::assertQueued(AllocationMessageReceived::class, fn ($mail) => $mail->hasTo($secretSantaEmailAddress));
+    $santaAllocation = Allocation::where('to_email', $recipient->email)->first();
+    $secretSantaEmailAddress = $santaAllocation->from_email;
+    $secretSantaName = $santaAllocation->from_name;
+    $secretSantaToken = $santaAllocation->from_access_token;
+
+    Mail::assertQueued(AllocationMessageReceived::class, function ($mail) use ($secretSantaEmailAddress, $secretSantaName, $secretSantaToken) {
+        $content = $mail->content();
+        $emailText = $content->htmlString;
+
+        return $mail->hasTo($secretSantaEmailAddress) &&
+               str_contains($emailText, "Hey {$secretSantaName},") &&
+               str_contains($emailText, "token={$secretSantaToken}");
+    });
 });
 
 test('send a message to recipient as Secret Santa using access token', function () {
@@ -136,8 +158,19 @@ test('send a message to recipient as Secret Santa using access token', function 
         'is_from_me' => true,
     ]);
 
-    $recipientEmailAddress = Allocation::where('from_access_token', $secretSantaAccessToken)->value('to_email');
-    Mail::assertQueued(AllocationMessageReceived::class, fn ($mail) => $mail->hasTo($recipientEmailAddress));
+    $santaAllocation = Allocation::where('from_access_token', $secretSantaAccessToken)->first();
+    $recipientEmailAddress = $santaAllocation->to_email;
+    $recipientName = Allocation::where('from_email', $recipientEmailAddress)->value('from_name');
+    $recipientToken = Allocation::where('from_email', $recipientEmailAddress)->value('from_access_token');
+
+    Mail::assertQueued(AllocationMessageReceived::class, function ($mail) use ($recipientEmailAddress, $recipientName, $recipientToken) {
+        $content = $mail->content();
+        $emailText = $content->htmlString;
+
+        return $mail->hasTo($recipientEmailAddress) &&
+               str_contains($emailText, "Hey {$recipientName},") &&
+               str_contains($emailText, "token={$recipientToken}");
+    });
 });
 
 test('send a message to Secret Santa as recipient using access token', function () {
@@ -179,9 +212,20 @@ test('send a message to Secret Santa as recipient using access token', function 
         'is_from_me' => true,
     ]);
 
-    $recipientEmailAddress = Allocation::where('from_access_token', $recipientAccessToken)->value('from_email');
-    $secretSantaEmailAddress = Allocation::where('to_email', $recipientEmailAddress)->value('from_email');
-    Mail::assertQueued(AllocationMessageReceived::class, fn ($mail) => $mail->hasTo($secretSantaEmailAddress));
+    $recipientAllocation = Allocation::where('from_access_token', $recipientAccessToken)->first();
+    $santaAllocation = Allocation::where('to_email', $recipientAllocation->from_email)->first();
+    $secretSantaEmailAddress = $santaAllocation->from_email;
+    $secretSantaName = $santaAllocation->from_name;
+    $secretSantaToken = $santaAllocation->from_access_token;
+
+    Mail::assertQueued(AllocationMessageReceived::class, function ($mail) use ($secretSantaEmailAddress, $secretSantaName, $secretSantaToken) {
+        $content = $mail->content();
+        $emailText = $content->htmlString;
+
+        return $mail->hasTo($secretSantaEmailAddress) &&
+               str_contains($emailText, "Hey {$secretSantaName},") &&
+               str_contains($emailText, "token={$secretSantaToken}");
+    });
 });
 
 test('show individual message as Secret Santa', function () {

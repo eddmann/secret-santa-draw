@@ -34,6 +34,8 @@ class AllocationMessageReceived extends Mailable
     public function content(): Content
     {
         $sender = $this->getSenderLabel();
+        $recipientName = $this->getRecipientName();
+        $recipientToken = $this->getRecipientToken();
 
         $id = base64_encode(
             route(
@@ -49,12 +51,12 @@ class AllocationMessageReceived extends Mailable
             '%s/remote/draws/%s?token=%s',
             env('APP_URL'),
             $id,
-            $this->message->allocation->from_access_token
+            $recipientToken
         );
 
         $text = sprintf(
             "Hey %s, you have a new message from %s in the '%s (%s)' Secret Santa draw. View it here: %s",
-            $this->message->allocation->from_name,
+            $recipientName,
             $sender,
             $this->message->allocation->draw->group->title,
             $this->message->allocation->draw->year,
@@ -67,5 +69,26 @@ class AllocationMessageReceived extends Mailable
     private function getSenderLabel(): string
     {
         return $this->message->is_from_secret_santa ? 'Your Secret Santa' : $this->message->allocation->to_name;
+    }
+
+    private function getRecipientName(): string
+    {
+        return $this->message->is_from_secret_santa ? $this->message->allocation->to_name : $this->message->allocation->from_name;
+    }
+
+    private function getRecipientToken(): string
+    {
+        if ($this->message->is_from_secret_santa) {
+            // Message is from Secret Santa to recipient, need recipient's access token
+            $recipientAllocation = \App\Models\Allocation::where([
+                'draw_id' => $this->message->allocation->draw_id,
+                'from_email' => $this->message->allocation->to_email,
+            ])->firstOrFail();
+
+            return $recipientAllocation->from_access_token;
+        }
+
+        // Message is from recipient to Secret Santa, use Secret Santa's token
+        return $this->message->allocation->from_access_token;
     }
 }
