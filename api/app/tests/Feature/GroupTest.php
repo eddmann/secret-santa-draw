@@ -5,6 +5,7 @@ use App\Models\User;
 use function PHPUnit\Framework\assertArrayHasKey;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertNull;
 
 test('create new group', function () {
     $user = User::factory()->createOne();
@@ -186,4 +187,51 @@ test('includes related draws within group', function () {
     assertArrayHasKey('draws', $response['_embedded']);
     assertCount(1, $response['_embedded']['draws']['_links']['draws']);
     assertCount(1, $response['_embedded']['draws']['_embedded']['draws']);
+});
+
+test('includes prefill data from previous years draw', closure: function () {
+    $user = User::factory()->createOne();
+
+    $group = $user->groups()->create(['title' => 'Test Group']);
+
+    $this->travelTo(now()->subYear());
+
+    $group->draw(now()->year, "Last year's draw", $participants = $this->participants());
+
+    $this->travelBack();
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('groups.show', ['group' => $group->id]));
+
+    $response->assertOk();
+
+    $prefill = $response['previous_years_draw_prefill'];
+
+    assertEquals(
+        collect($participants)->pluck('email')->sort()->values()->toArray(),
+        collect($prefill['participants'])->pluck('email')->sort()->values()->toArray()
+    );
+
+    $lastYearsDraw = $group->draws()->where('year', now()->year - 1)->first();
+    foreach ($lastYearsDraw->allocations as $allocation) {
+        assertEquals([$allocation->to_email], $prefill['exclusions'][$allocation->from_email]);
+    }
+});
+
+test('returns no prefill data when no previous years draw exists', function () {
+    $user = User::factory()->createOne();
+
+    $group = $this
+        ->actingAs($user)
+        ->post('/api/groups', [
+            'title' => 'Test Group',
+        ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->get($group['_links']['self']['href']);
+
+    $response->assertOk();
+    assertNull($response['previous_years_draw_prefill']);
 });

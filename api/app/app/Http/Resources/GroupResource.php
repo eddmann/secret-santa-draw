@@ -29,6 +29,7 @@ class GroupResource extends JsonResource
                 'draws' => new DrawCollection($this->resource, $this->draws),
             ],
             'title' => $this->title,
+            'previous_years_draw_prefill' => $this->getPreviousYearsDrawPrefillData(),
         ];
     }
 

@@ -36,7 +36,7 @@ class DrawController
             'participants.*.exclusions.*' => 'required|email',
         ]);
 
-        $draw = $group->draw((int) date('Y'), $request->description, $request->participants);
+        $draw = $group->draw(now()->year, $request->description, $request->participants);
 
         event(new DrawConducted($draw));
 

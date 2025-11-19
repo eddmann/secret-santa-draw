@@ -32,9 +32,35 @@ class Group extends Model
 
     public function canConductDraw(?int $userId): bool
     {
-        $hasDrawForCurrentYear = collect($this->draws)->some(fn (Draw $draw) => $draw->year === (int) date('Y'));
+        $hasDrawForCurrentYear = collect($this->draws)->some(fn (Draw $draw) => $draw->year === now()->year);
 
         return $userId === $this->owner_id && ! $hasDrawForCurrentYear;
+    }
+
+    public function getPreviousYearsDrawPrefillData(): ?array
+    {
+        $previousDraw = collect($this->draws)->firstWhere('year', now()->year - 1);
+
+        if (! $previousDraw) {
+            return null;
+        }
+
+        [$participants, $exclusions] = collect($previousDraw->allocations)->reduce(
+            function (array $carry, Allocation $allocation): array {
+                [$participants, $exclusions] = $carry;
+
+                return [
+                    [...$participants, ['name' => $allocation->from_name, 'email' => $allocation->from_email]],
+                    [...$exclusions, $allocation->from_email => [$allocation->to_email]],
+                ];
+            },
+            [[], []]
+        );
+
+        return [
+            'participants' => $participants,
+            'exclusions' => $exclusions,
+        ];
     }
 
     public function draw(int $year, string $description, array $participants): Draw
