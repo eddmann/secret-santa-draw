@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Allocation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,6 +22,26 @@ class AllocationResource extends JsonResource
                             'group' => $this->draw->group->id,
                             'draw' => $this->draw->id,
                             'allocation' => $this->id,
+                        ]
+                    ),
+                ],
+                'messages-to-recipient' => [
+                    'href' => route(
+                        'allocations.messages.index',
+                        [
+                            'group' => $this->draw->group->id,
+                            'draw' => $this->draw->id,
+                            'allocation' => $this->id,
+                        ]
+                    ),
+                ],
+                'messages-from-santa' => [
+                    'href' => route(
+                        'allocations.messages.index',
+                        [
+                            'group' => $this->draw->group->id,
+                            'draw' => $this->draw->id,
+                            'allocation' => $this->getSantaAllocationId(),
                         ]
                     ),
                 ],
@@ -49,5 +70,13 @@ class AllocationResource extends JsonResource
                 'allocation' => $this->id,
             ]
         );
+    }
+
+    private function getSantaAllocationId(): int
+    {
+        return Allocation::where('draw_id', $this->draw_id)
+            ->where('to_email', $this->from_email)
+            ->firstOrFail()
+            ->id;
     }
 }

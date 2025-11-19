@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AllocationController;
+use App\Http\Controllers\AllocationMessageController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\BootstrapController;
 use App\Http\Controllers\DrawController;
@@ -44,10 +45,18 @@ Route::controller(DrawController::class)->group(function () {
     Route::get('/api/groups/{group}/draws/{draw}', 'show')->name('draws.show');
 });
 
-Route::controller(AllocationController::class)->group(function () {
-    Route::get('/api/groups/{group}/draws/{draw}/allocations', 'index')
-        ->middleware('auth:sanctum')
-        ->name('allocations');
-    Route::get('/api/groups/{group}/draws/{draw}/allocations/{allocation}', 'show')->name('allocations.show');
-    Route::put('/api/groups/{group}/draws/{draw}/allocations/{allocation}/ideas', 'provideIdeas')->name('allocations.ideas');
+Route::prefix('/api/groups/{group}/draws/{draw}/allocations')->group(function () {
+    Route::controller(AllocationController::class)->group(function () {
+        Route::get('/', 'index')
+            ->middleware('auth:sanctum')
+            ->name('allocations');
+        Route::get('/{allocation}', 'show')->name('allocations.show');
+        Route::put('/{allocation}/ideas', 'provideIdeas')->name('allocations.ideas');
+    });
+
+    Route::controller(AllocationMessageController::class)->group(function () {
+        Route::get('/{allocation}/messages', 'index')->name('allocations.messages.index');
+        Route::post('/{allocation}/messages', 'create')->name('allocations.messages.create');
+        Route::get('/{allocation}/messages/{message}', 'show')->name('allocations.messages.show');
+    });
 });
