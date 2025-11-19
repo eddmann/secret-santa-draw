@@ -29,7 +29,7 @@ const MessageContent = styled(Content)`
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 5rem - env(safe-area-inset-top));
+  height: calc(100vh - 5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow: hidden;
 `;
 
