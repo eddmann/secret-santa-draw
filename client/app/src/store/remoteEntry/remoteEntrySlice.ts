@@ -1,12 +1,13 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
-import { RemoteEntry, RemoteParticipant } from '@/types';
+import { RemoteDrawPrefill, RemoteEntry, RemoteParticipant } from '@/types';
 
 import { draw } from './actions';
 
 type State = RemoteEntry & {
   isDrawing: boolean;
+  wasPrefilled: boolean;
 };
 
 export const initialState: State = {
@@ -14,13 +15,30 @@ export const initialState: State = {
   participants: [],
   exclusions: {},
   isDrawing: false,
+  wasPrefilled: false,
 };
 
 export const remoteEntrySlice = createSlice({
   name: 'remoteEntry',
   initialState,
   reducers: {
-    startDraw() {
+    startDraw(
+      _state,
+      action: PayloadAction<
+        | {
+            prefill: RemoteDrawPrefill | null;
+          }
+        | undefined
+      >,
+    ) {
+      if (action.payload?.prefill) {
+        return {
+          ...initialState,
+          participants: action.payload.prefill.participants,
+          exclusions: action.payload.prefill.exclusions,
+          wasPrefilled: true,
+        };
+      }
       return initialState;
     },
     updateDescription(state, action: PayloadAction<string>) {

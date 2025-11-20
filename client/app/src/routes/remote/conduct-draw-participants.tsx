@@ -26,6 +26,36 @@ const shake = keyframes`
   100% { transform: translateX(0) }
 `;
 
+const slideDown = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const PrefillNotice = styled.div`
+  background: rgb(59 130 246 / 8%);
+  border: 1px solid rgb(59 130 246 / 25%);
+  border-radius: ${({ theme }) => theme.spacing.padding.s};
+  padding: ${({ theme }) => theme.spacing.padding.m};
+  font-size: 0.9em;
+  color: rgb(255 255 255 / 95%);
+  animation: ${slideDown} 400ms ease-out;
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.padding.s};
+
+  &::before {
+    content: '✨';
+    font-size: 1.2em;
+    flex-shrink: 0;
+  }
+`;
+
 const AddParticipantForm = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.padding.s};
@@ -120,6 +150,12 @@ export const ConductRemoteDrawParticipants = () => {
         <Description>
           Describe your {new Date().getFullYear()} draw (budget, themes etc.), and who is participating in it.
         </Description>
+
+        {remoteEntry.wasPrefilled && (
+          <PrefillNotice>
+            Participants and exclusions from last year have been pre-filled. Feel free to modify them as needed.
+          </PrefillNotice>
+        )}
 
         <TextField
           value={remoteEntry.description}

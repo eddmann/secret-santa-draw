@@ -34,6 +34,7 @@ export const fetchGroup = createAsyncThunk('remoteGroups/fetch', async ({ id }: 
       title: groupState.data.title,
       canConductDraw: groupState.links.has('conduct-draw'),
       draws,
+      previousYearsDrawPrefill: groupState.data.previous_years_draw_prefill,
     },
   };
 });

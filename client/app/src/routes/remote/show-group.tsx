@@ -73,7 +73,7 @@ export const ShowRemoteGroup = () => {
           disabled={!group.canConductDraw}
           variant="large"
           onClick={() => {
-            dispatch(startDraw());
+            dispatch(startDraw({ prefill: group.previousYearsDrawPrefill }));
             navigate(`/remote/${group.id}/draws/conduct/participants`);
           }}
         />

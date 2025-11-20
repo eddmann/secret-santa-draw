@@ -19,7 +19,18 @@ export type LocalDraw = {
 
 export type RemoteGroup = { id: string; title: string };
 
-export type RemoteDetailsGroup = { id: string; title: string; canConductDraw: boolean; draws: RemoteDraw[] };
+export type RemoteDrawPrefill = {
+  participants: RemoteParticipant[];
+  exclusions: Record<RemoteParticipant['email'], RemoteParticipant['email'][]>;
+};
+
+export type RemoteDetailsGroup = {
+  id: string;
+  title: string;
+  canConductDraw: boolean;
+  draws: RemoteDraw[];
+  previousYearsDrawPrefill: RemoteDrawPrefill | null;
+};
 
 export type RemoteDraw = { id: string; year: string };
 
@@ -76,6 +87,7 @@ export type DrawResource = {
 
 export type GroupResource = {
   title: string;
+  previous_years_draw_prefill: RemoteDrawPrefill | null;
 };
 
 export type AllocationMessage = {
