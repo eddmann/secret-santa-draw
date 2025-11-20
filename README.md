@@ -16,16 +16,13 @@ The service was built in a RAD manner, with a self-imposed time constraint of ju
   - Register and create groups to manage annual Secret Santa draws.
   - Add participants with names and email addresses.
   - Apply allocation exclusions (e.g., couples, previous pairings).
+  - Automatically populate new draws with participants and exclusions from the previous year's draw.
 - **Automated Email Notifications**: Participants receive an email with their Secret Santa allocation.
-- **Gift Ideas Management**: Participants can provide and view gift ideas for their assigned allocation.
+- **Gift Ideas**: Participants can provide multiple gift ideas and links (up to 5), ordered by preference.
+- **Anonymous Messaging**: Communicate anonymously with your Secret Santa match through built-in messaging.
 - **Account Registration:**
   - Participants can optionally register with the service.
   - Allocations are linked to accounts based on email address, consolidating access to all associated draws.
-
-## Future Features
-
-- **Prefill Draw Entries**: Automatically populate draw participants from the previous year's draw.
-- **Enhanced Gift Ideas**: Support for various idea types (URLs, images, etc.).
 
 ## 🛠️ Technical Overview
 
