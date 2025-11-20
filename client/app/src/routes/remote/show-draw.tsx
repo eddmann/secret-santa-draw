@@ -63,16 +63,32 @@ const Result = styled.div`
   margin-bottom: 1rem;
 `;
 
-const SaveButton = styled(Button)`
+const SaveButtonWrapper = styled.div`
   margin-top: 1rem;
 
   @media (width <= 768px) {
     position: fixed;
-    bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
-    width: auto;
+    box-sizing: border-box;
+    inset: auto 0 0;
+    width: 100%;
+    padding: ${({ theme }) => theme.spacing.padding.s} ${({ theme }) => theme.spacing.padding.m}
+      max(${({ theme }) => theme.spacing.padding.m}, env(safe-area-inset-bottom))
+      ${({ theme }) => theme.spacing.padding.m};
+    background-color: ${({ theme }) => theme.colors.background};
+    max-width: 600px;
+    margin: 0 auto;
     z-index: 1000;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -1rem;
+      left: 0;
+      pointer-events: none;
+      background-image: linear-gradient(to bottom, rgba(202 5 44 / 0%), rgba(202 5 44 / 100%) 90%);
+      width: 100%;
+      height: 1rem;
+    }
   }
 `;
 
@@ -192,7 +208,9 @@ const Allocation = ({
                 disabled={!allocation.canProvideIdeas}
               />
               {allocation.canProvideIdeas && hasChanges() && (
-                <SaveButton title="Save Ideas" variant="large" onClick={handleSave} />
+                <SaveButtonWrapper>
+                  <Button title="Save Ideas" variant="large" onClick={handleSave} />
+                </SaveButtonWrapper>
               )}
             </GiftIdeaCard>
           </GiftIdeasContainer>
@@ -243,10 +261,32 @@ const AllocationsListWrapper = styled.div`
 
 const RegisterPrompt = styled.div`
   margin-top: 2rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: ${({ theme }) => theme.colors.text};
+  background: rgb(170 4 37 / 40%);
+  border: 2px solid rgb(0 0 0 / 30%);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+  line-height: 1.5;
 `;
 
-const RegisterButton = styled(Button)`
-  margin-top: 1rem;
+const RegisterLink = styled.span`
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.text};
+  font-weight: ${({ theme }) => theme.typography.weight.bold};
+  text-decoration: none;
+  border-bottom: 2px solid ${({ theme }) => theme.colors.text};
+  padding-bottom: 2px;
+  display: inline-block;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (width <= 768px) {
+    margin-top: 0.5rem;
+  }
 `;
 
 const AllocationsList = ({ id, allocations }: { id: RemoteDraw['id']; allocations: RemoteAllocation[] }) => {
@@ -357,14 +397,14 @@ export const ShowRemoteDraw = () => {
 
         {user.canRegister && (
           <RegisterPrompt>
-            <div>Want to conduct your own Secret Santa draw?</div>
-            <RegisterButton
-              title="Register"
-              variant="large"
+            Want to do a Secret Santa draw?{' '}
+            <RegisterLink
               onClick={() => {
                 navigate('/register');
               }}
-            />
+            >
+              Register here
+            </RegisterLink>
           </RegisterPrompt>
         )}
       </Content>
