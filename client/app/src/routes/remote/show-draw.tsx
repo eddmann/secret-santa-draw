@@ -395,7 +395,7 @@ export const ShowRemoteDraw = () => {
 
         {draw.allocations.length > 0 && <AllocationsList id={id} allocations={draw.allocations} />}
 
-        {user.canRegister && (
+        {user.canRegister && isRevealed && (
           <RegisterPrompt>
             Want to do a Secret Santa draw?{' '}
             <RegisterLink
