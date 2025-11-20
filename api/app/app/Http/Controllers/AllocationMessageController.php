@@ -68,10 +68,12 @@ class AllocationMessageController
 
     private function isUserSecretSanta(Request $request, Allocation $allocation): bool
     {
-        $userId = auth()->id();
-        $accessToken = $request->header('X-Access-Token');
+        if ($accessToken = $request->header('X-Access-Token')) {
+            return $allocation->from_access_token === $accessToken;
+        }
 
-        return ($userId !== null && $allocation->from_user_id === $userId)
-            || ($accessToken !== null && $allocation->from_access_token === $accessToken);
+        $userId = auth()->id();
+
+        return $userId !== null && $allocation->from_user_id === $userId;
     }
 }
