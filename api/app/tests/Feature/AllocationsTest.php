@@ -606,7 +606,7 @@ test('sends email to Secret Santa when recipient provides gift ideas', function 
     $recipientAllocationModel = Allocation::where('from_name', $recipientName)->first();
     $recipientEmail = $recipientAllocationModel->from_email;
 
-    $santaAllocation = Allocation::where('to_email', $recipientEmail)->first();
+    $santaAllocation = $recipientAllocationModel->secretSanta;
     $santaEmail = $santaAllocation->from_email;
     $santaName = $santaAllocation->from_name;
     $santaToken = $santaAllocation->from_access_token;
@@ -704,7 +704,7 @@ test('sends email when recipient clears gift ideas', function () {
     $recipientAllocationModel = Allocation::where('from_name', $recipientName)->first();
     $recipientEmail = $recipientAllocationModel->from_email;
 
-    $santaAllocation = Allocation::where('to_email', $recipientEmail)->first();
+    $santaAllocation = $recipientAllocationModel->secretSanta;
     $santaEmail = $santaAllocation->from_email;
 
     Mail::assertQueued(\App\Mail\AllocationGiftIdeasProvided::class, function ($mail) use ($santaEmail) {

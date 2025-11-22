@@ -80,12 +80,7 @@ class AllocationMessageReceived extends Mailable
     {
         if ($this->message->is_from_secret_santa) {
             // Message is from Secret Santa to recipient, need recipient's access token
-            $recipientAllocation = \App\Models\Allocation::where([
-                'draw_id' => $this->message->allocation->draw_id,
-                'from_email' => $this->message->allocation->to_email,
-            ])->firstOrFail();
-
-            return $recipientAllocation->from_access_token;
+            return $this->message->allocation->recipient->from_access_token;
         }
 
         // Message is from recipient to Secret Santa, use Secret Santa's token

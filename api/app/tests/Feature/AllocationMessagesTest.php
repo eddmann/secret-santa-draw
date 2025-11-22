@@ -49,8 +49,8 @@ test('send a message to recipient as authenticated Secret Santa user', function 
 
     $santaAllocation = Allocation::where('from_email', $santa->email)->first();
     $recipientEmailAddress = $santaAllocation->to_email;
-    $recipientName = Allocation::where('from_email', $recipientEmailAddress)->value('from_name');
-    $recipientToken = Allocation::where('from_email', $recipientEmailAddress)->value('from_access_token');
+    $recipientName = $santaAllocation->recipient->from_name;
+    $recipientToken = $santaAllocation->recipient->from_access_token;
 
     Mail::assertQueued(AllocationMessageReceived::class, function ($mail) use ($recipientEmailAddress, $recipientName, $recipientToken) {
         $content = $mail->content();
@@ -160,8 +160,8 @@ test('send a message to recipient as Secret Santa using access token', function 
 
     $santaAllocation = Allocation::where('from_access_token', $secretSantaAccessToken)->first();
     $recipientEmailAddress = $santaAllocation->to_email;
-    $recipientName = Allocation::where('from_email', $recipientEmailAddress)->value('from_name');
-    $recipientToken = Allocation::where('from_email', $recipientEmailAddress)->value('from_access_token');
+    $recipientName = $santaAllocation->recipient->from_name;
+    $recipientToken = $santaAllocation->recipient->from_access_token;
 
     Mail::assertQueued(AllocationMessageReceived::class, function ($mail) use ($recipientEmailAddress, $recipientName, $recipientToken) {
         $content = $mail->content();
@@ -213,7 +213,7 @@ test('send a message to Secret Santa as recipient using access token', function 
     ]);
 
     $recipientAllocation = Allocation::where('from_access_token', $recipientAccessToken)->first();
-    $santaAllocation = Allocation::where('to_email', $recipientAllocation->from_email)->first();
+    $santaAllocation = $recipientAllocation->secretSanta;
     $secretSantaEmailAddress = $santaAllocation->from_email;
     $secretSantaName = $santaAllocation->from_name;
     $secretSantaToken = $santaAllocation->from_access_token;

@@ -6,7 +6,6 @@ namespace App\Listeners;
 
 use App\Events\AllocationGiftIdeasProvided;
 use App\Mail\AllocationGiftIdeasProvided as AllocationGiftIdeasProvidedMail;
-use App\Models\Allocation;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 
