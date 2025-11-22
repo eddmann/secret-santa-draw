@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AllocationGiftIdeasProvided;
 use App\Http\Resources\AllocationCollection;
 use App\Http\Resources\AllocationResource;
 use App\Models\Allocation;
@@ -44,6 +45,8 @@ class AllocationController
         $allocation->update([
             'from_ideas' => $request->ideas ?? [],
         ]);
+
+        AllocationGiftIdeasProvided::dispatch($allocation);
 
         return response(status: Response::HTTP_ACCEPTED);
     }

@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Allocation;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 use function PHPUnit\Framework\assertArrayHasKey;
 use function PHPUnit\Framework\assertCount;
@@ -565,4 +567,151 @@ test('fails when individual idea exceeds 500 characters', function () {
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors('ideas.0');
+});
+
+test('sends email to Secret Santa when recipient provides gift ideas', function () {
+    Mail::fake();
+    $owner = User::factory()->createOne();
+
+    $group = $this
+        ->actingAs($owner)
+        ->post('/api/groups', [
+            'title' => 'Test Title',
+        ]);
+
+    $draw = $this
+        ->actingAs($owner)
+        ->post($group['_links']['conduct-draw']['href'], [
+            'description' => 'Sample description',
+            'participants' => $this->participants(),
+        ]);
+
+    $allocations = $this
+        ->actingAs($owner)
+        ->get($draw['_links']['allocations']['href']);
+
+    $recipientAllocation = $allocations['_embedded']['allocations'][0];
+    $recipientAccessToken = $recipientAllocation['from']['access_token'];
+    $recipientName = $recipientAllocation['from']['name'];
+
+    auth()->forgetGuards();
+
+    $this
+        ->put(
+            $recipientAllocation['_links']['provide-ideas']['href'],
+            ['ideas' => $ideas = ['Sample idea 1', 'Sample idea 2']],
+            ['X-Access-Token' => $recipientAccessToken]
+        );
+
+    $recipientAllocationModel = Allocation::where('from_name', $recipientName)->first();
+    $recipientEmail = $recipientAllocationModel->from_email;
+
+    $santaAllocation = Allocation::where('to_email', $recipientEmail)->first();
+    $santaEmail = $santaAllocation->from_email;
+    $santaName = $santaAllocation->from_name;
+    $santaToken = $santaAllocation->from_access_token;
+
+    Mail::assertQueued(\App\Mail\AllocationGiftIdeasProvided::class, function ($mail) use ($santaEmail, $santaName, $recipientName, $santaToken) {
+        $content = $mail->content();
+        $emailText = $content->htmlString;
+
+        return $mail->hasTo($santaEmail) &&
+               str_contains($emailText, "Hey {$santaName},") &&
+               str_contains($emailText, "{$recipientName} has updated their gift ideas") &&
+               str_contains($emailText, "token={$santaToken}");
+    });
+});
+
+test('sends email to Secret Santa when recipient updates gift ideas', function () {
+    Mail::fake();
+    $owner = User::factory()->createOne();
+
+    $group = $this
+        ->actingAs($owner)
+        ->post('/api/groups', [
+            'title' => 'Test Title',
+        ]);
+
+    $draw = $this
+        ->actingAs($owner)
+        ->post($group['_links']['conduct-draw']['href'], [
+            'description' => 'Sample description',
+            'participants' => $this->participants(),
+        ]);
+
+    $allocations = $this
+        ->actingAs($owner)
+        ->get($draw['_links']['allocations']['href']);
+
+    $recipientAllocation = $allocations['_embedded']['allocations'][0];
+    $recipientAccessToken = $recipientAllocation['from']['access_token'];
+
+    auth()->forgetGuards();
+
+    $this
+        ->put(
+            $recipientAllocation['_links']['provide-ideas']['href'],
+            ['ideas' => ['Initial idea']],
+            ['X-Access-Token' => $recipientAccessToken]
+        );
+
+    Mail::assertQueued(\App\Mail\AllocationGiftIdeasProvided::class, 1);
+
+    $this
+        ->put(
+            $recipientAllocation['_links']['provide-ideas']['href'],
+            ['ideas' => ['Updated idea 1', 'Updated idea 2']],
+            ['X-Access-Token' => $recipientAccessToken]
+        );
+
+    Mail::assertQueued(\App\Mail\AllocationGiftIdeasProvided::class, 2);
+});
+
+test('sends email when recipient clears gift ideas', function () {
+    Mail::fake();
+    $owner = User::factory()->createOne();
+
+    $group = $this
+        ->actingAs($owner)
+        ->post('/api/groups', [
+            'title' => 'Test Title',
+        ]);
+
+    $draw = $this
+        ->actingAs($owner)
+        ->post($group['_links']['conduct-draw']['href'], [
+            'description' => 'Sample description',
+            'participants' => $this->participants(),
+        ]);
+
+    $allocations = $this
+        ->actingAs($owner)
+        ->get($draw['_links']['allocations']['href']);
+
+    $recipientAllocation = $allocations['_embedded']['allocations'][0];
+    $recipientAccessToken = $recipientAllocation['from']['access_token'];
+    $recipientName = $recipientAllocation['from']['name'];
+
+    auth()->forgetGuards();
+
+    $this
+        ->put(
+            $recipientAllocation['_links']['provide-ideas']['href'],
+            ['ideas' => []],
+            ['X-Access-Token' => $recipientAccessToken]
+        );
+
+    $recipientAllocationModel = Allocation::where('from_name', $recipientName)->first();
+    $recipientEmail = $recipientAllocationModel->from_email;
+
+    $santaAllocation = Allocation::where('to_email', $recipientEmail)->first();
+    $santaEmail = $santaAllocation->from_email;
+
+    Mail::assertQueued(\App\Mail\AllocationGiftIdeasProvided::class, function ($mail) use ($santaEmail) {
+        $content = $mail->content();
+        $emailText = $content->htmlString;
+
+        return $mail->hasTo($santaEmail) &&
+               str_contains($emailText, 'has updated their gift ideas');
+    });
 });
