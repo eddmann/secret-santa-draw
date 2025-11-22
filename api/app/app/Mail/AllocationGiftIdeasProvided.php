@@ -14,8 +14,7 @@ class AllocationGiftIdeasProvided extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public Allocation $recipientAllocation,
-        public Allocation $secretSantaAllocation
+        public Allocation $recipientAllocation
     ) {}
 
     public function envelope(): Envelope
@@ -36,8 +35,8 @@ class AllocationGiftIdeasProvided extends Mailable
             route(
                 'draws.show',
                 [
-                    'group' => $this->secretSantaAllocation->draw->group->id,
-                    'draw' => $this->secretSantaAllocation->draw->id,
+                    'group' => $this->recipientAllocation->draw->group->id,
+                    'draw' => $this->recipientAllocation->draw->id,
                 ]
             )
         );
@@ -46,12 +45,12 @@ class AllocationGiftIdeasProvided extends Mailable
             '%s/remote/draws/%s?token=%s',
             env('APP_URL'),
             $id,
-            $this->secretSantaAllocation->from_access_token
+            $this->recipientAllocation->secretSanta->from_access_token
         );
 
         $text = sprintf(
             "Hey %s, %s has updated their gift ideas for the '%s (%s)' Secret Santa draw. View them here: %s",
-            $this->secretSantaAllocation->from_name,
+            $this->recipientAllocation->secretSanta->from_name,
             $this->recipientAllocation->from_name,
             $this->recipientAllocation->draw->group->title,
             $this->recipientAllocation->draw->year,

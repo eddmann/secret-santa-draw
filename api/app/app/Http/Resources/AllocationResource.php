@@ -41,7 +41,7 @@ class AllocationResource extends JsonResource
                         [
                             'group' => $this->draw->group->id,
                             'draw' => $this->draw->id,
-                            'allocation' => $this->getSantaAllocationId(),
+                            'allocation' => $this->secretSanta->id,
                         ]
                     ),
                 ],
@@ -70,13 +70,5 @@ class AllocationResource extends JsonResource
                 'allocation' => $this->id,
             ]
         );
-    }
-
-    private function getSantaAllocationId(): int
-    {
-        return Allocation::where('draw_id', $this->draw_id)
-            ->where('to_email', $this->from_email)
-            ->firstOrFail()
-            ->id;
     }
 }

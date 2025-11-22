@@ -14,12 +14,7 @@ class SendAllocationGiftIdeasProvidedNotification implements ShouldQueue
 {
     public function handle(AllocationGiftIdeasProvided $event): void
     {
-        $secretSantaAllocation = Allocation::where([
-            'draw_id' => $event->allocation->draw_id,
-            'to_email' => $event->allocation->from_email,
-        ])->firstOrFail();
-
-        Mail::to($secretSantaAllocation->from_email)
-            ->queue(new AllocationGiftIdeasProvidedMail($event->allocation, $secretSantaAllocation));
+        Mail::to($event->allocation->secretSanta->from_email)
+            ->queue(new AllocationGiftIdeasProvidedMail($event->allocation));
     }
 }
