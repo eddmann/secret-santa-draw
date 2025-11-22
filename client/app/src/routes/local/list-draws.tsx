@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import HomeIcon from '@/assets/home.svg?react';
 import TrashIcon from '@/assets/trash.svg?react';
 import { Button } from '@/components/Button';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Content } from '@/components/Content';
 import { Description } from '@/components/Description';
 import { Header } from '@/components/Header';
@@ -29,6 +31,7 @@ export const ListLocalDraws = () => {
   const draws = useAppSelector(drawsSelector);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [drawToRemove, setDrawToRemove] = useState<string | null>(null);
 
   return (
     <>
@@ -49,7 +52,7 @@ export const ListLocalDraws = () => {
               icon={<TrashIcon />}
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(removeDraw(draw.id));
+                setDrawToRemove(draw.id);
               }}
             />
           </Draw>
@@ -63,6 +66,23 @@ export const ListLocalDraws = () => {
           }}
         />
       </Content>
+
+      <ConfirmDialog
+        isOpen={drawToRemove !== null}
+        title="Remove Draw?"
+        message={`"${draws.find((d) => d.id === drawToRemove)?.entry.title}" will be permanently deleted.`}
+        onConfirm={() => {
+          if (drawToRemove) {
+            dispatch(removeDraw(drawToRemove));
+            setDrawToRemove(null);
+          }
+        }}
+        onCancel={() => {
+          setDrawToRemove(null);
+        }}
+        confirmText="Remove"
+        cancelText="Keep It"
+      />
     </>
   );
 };

@@ -1,11 +1,12 @@
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import TrashIcon from '@/assets/trash.svg?react';
 import { BackIcon } from '@/components/BackIcon';
 import { Button } from '@/components/Button';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Content } from '@/components/Content';
 import { Description } from '@/components/Description';
 import { Header } from '@/components/Header';
@@ -22,6 +23,7 @@ export const ShowRemoteGroup = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { group, isLoadingGroup } = useAppSelector(remoteGroupsSelector);
+  const [drawToRemove, setDrawToRemove] = useState<{ groupId: string; drawId: string; year: number } | null>(null);
 
   useEffect(() => {
     void dispatch(fetchGroup({ id }));
@@ -58,9 +60,7 @@ export const ShowRemoteGroup = () => {
                   icon={<TrashIcon />}
                   onClick={(e) => {
                     e.preventDefault();
-                    void dispatch(removeDraw({ groupId: group.id, drawId: draw.id }))
-                      .then(unwrapResult)
-                      .then(() => toast.success('Successfully removed draw.'));
+                    setDrawToRemove({ groupId: group.id, drawId: draw.id, year: draw.year });
                   }}
                 />
               </List.Item>
@@ -82,6 +82,30 @@ export const ShowRemoteGroup = () => {
           <p style={{ margin: 0, textAlign: 'center' }}>Remove this year&apos;s draw to conduct a new one.</p>
         )}
       </Content>
+
+      <ConfirmDialog
+        isOpen={drawToRemove !== null}
+        title="Remove Draw?"
+        message={`The ${drawToRemove?.year} draw will be permanently deleted from ${group.title}.`}
+        onConfirm={() => {
+          if (drawToRemove) {
+            void dispatch(removeDraw({ groupId: drawToRemove.groupId, drawId: drawToRemove.drawId }))
+              .then(unwrapResult)
+              .then(() => {
+                toast.success('Successfully removed draw.');
+                setDrawToRemove(null);
+              })
+              .catch(() => {
+                setDrawToRemove(null);
+              });
+          }
+        }}
+        onCancel={() => {
+          setDrawToRemove(null);
+        }}
+        confirmText="Remove"
+        cancelText="Keep It"
+      />
     </>
   );
 };
