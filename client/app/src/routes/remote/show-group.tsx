@@ -23,7 +23,7 @@ export const ShowRemoteGroup = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { group, isLoadingGroup } = useAppSelector(remoteGroupsSelector);
-  const [drawToRemove, setDrawToRemove] = useState<{ groupId: string; drawId: string; year: number } | null>(null);
+  const [drawToRemove, setDrawToRemove] = useState<{ groupId: string; drawId: string; year: string } | null>(null);
 
   useEffect(() => {
     void dispatch(fetchGroup({ id }));
