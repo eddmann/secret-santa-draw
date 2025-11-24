@@ -20,7 +20,7 @@ class AllocationGiftIdeasProvided extends Mailable
     public function envelope(): Envelope
     {
         $subject = sprintf(
-            '%s has provided gift ideas - %s (%s)',
+            '%s has updated their gift ideas - %s (%s)',
             $this->recipientAllocation->from_name,
             $this->recipientAllocation->draw->group->title,
             $this->recipientAllocation->draw->year
