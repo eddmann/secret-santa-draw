@@ -31,10 +31,7 @@ const MessageContent = styled(Content)`
 const ContentWrapper = styled.div<{ $keyboardHeight: number }>`
   display: flex;
   flex-direction: column;
-  height: calc(
-    100dvh - 5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom) -
-      ${({ $keyboardHeight }) => $keyboardHeight}px
-  );
+  height: calc(100dvh - 5rem - env(safe-area-inset-top) - ${({ $keyboardHeight }) => $keyboardHeight}px);
   overflow: hidden;
   transition: height 0.1s ease-out;
 `;
