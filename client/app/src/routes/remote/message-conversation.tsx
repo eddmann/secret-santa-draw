@@ -1,5 +1,6 @@
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useEffect, useRef, useState } from 'react';
+import Linkify from 'react-linkify';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled, { css, keyframes } from 'styled-components';
@@ -66,6 +67,12 @@ const MessageText = styled.p`
   margin: 0;
   line-height: 1.4;
   white-space: pre-wrap;
+  word-break: break-word;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
 `;
 
 const MessageTime = styled.div`
@@ -255,7 +262,17 @@ export const MessageConversation = ({ direction }: MessageConversationProps) => 
                 ) : (
                   messages.map((msg) => (
                     <MessageBubble key={msg.id} $fromMe={msg.fromMe}>
-                      <MessageText>{msg.message}</MessageText>
+                      <MessageText>
+                        <Linkify
+                          componentDecorator={(decoratedHref, decoratedText, key) => (
+                            <a href={decoratedHref} key={key} target="_blank" rel="noopener noreferrer">
+                              {decoratedText}
+                            </a>
+                          )}
+                        >
+                          {msg.message}
+                        </Linkify>
+                      </MessageText>
                       <MessageTime>{formatTime(msg.createdAt)}</MessageTime>
                     </MessageBubble>
                   ))
