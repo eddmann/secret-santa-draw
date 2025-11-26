@@ -12,6 +12,9 @@ export const initialState = {
 
   isLoggingIn: false,
   isRegistering: false,
+
+  name: null as string | null,
+  email: null as string | null,
 };
 
 export const userSlice = createSlice({
@@ -29,6 +32,8 @@ export const userSlice = createSlice({
       state.canRegister = action.payload.canRegister;
       state.canAccessGroups = action.payload.canAccessGroups;
       state.canDeleteAccount = action.payload.canDeleteAccount;
+      state.name = action.payload.name;
+      state.email = action.payload.email;
     });
     builder.addCase(bootstrap.rejected, () => {
       return { ...initialState, isBootstrapping: false };
