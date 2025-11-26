@@ -25,6 +25,7 @@ import { ListRemoteGroups } from './routes/remote/list-groups';
 import { MessageConversation } from './routes/remote/message-conversation';
 import { ShowRemoteDraw } from './routes/remote/show-draw';
 import { ShowRemoteGroup } from './routes/remote/show-group';
+import { Settings } from './routes/settings';
 import { store } from './store';
 import { bootstrap } from './store/user/actions';
 import { theme } from './theme';
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: 'register',
         element: <Register />,
+      },
+      {
+        path: 'settings',
+        element: <Settings />,
       },
       {
         path: 'remote',

@@ -13,12 +13,16 @@ export const bootstrap = createAsyncThunk('user/bootstrap', async () => {
     throw error;
   }
 
+  const data = resource.data as { user?: { name: string; email: string } };
+
   return {
     canLogin: resource.links.has('login'),
     canRegister: resource.links.has('register'),
     canLogout: resource.links.has('logout'),
     canAccessGroups: resource.links.has('groups'),
     canDeleteAccount: resource.links.has('delete-account'),
+    name: data.user?.name ?? null,
+    email: data.user?.email ?? null,
   };
 });
 

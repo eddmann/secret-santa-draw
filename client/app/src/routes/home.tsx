@@ -1,15 +1,15 @@
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled, { keyframes } from 'styled-components';
 
+import SettingsIcon from '@/assets/settings.svg?react';
 import { Button } from '@/components/Button';
 import { SantaPopup } from '@/components/SantaPopup';
 import { useSnowfall } from '@/hooks/useSnowfall';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { userSelector } from '@/store/user';
-import { deleteAccount, logout } from '@/store/user/actions';
+import { logout } from '@/store/user/actions';
 
 const slideDown = keyframes`
   from {
@@ -43,20 +43,23 @@ const DrawRoot = styled.div`
   gap: ${({ theme }) => theme.spacing.padding.m};
 `;
 
-const DeleteAccount = styled.div`
-  font-size: 0.85rem;
+const SettingsButton = styled.div`
   position: fixed;
   cursor: pointer;
   z-index: 1000;
   bottom: calc(1rem + env(safe-area-inset-bottom));
   left: 10px;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 `;
 
 export const Home = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector(userSelector);
-  const [deleteAccountConfirm, setDeleteAccountConfirm] = useState(false);
 
   const Snowfall = useSnowfall({
     snowflakes: {
@@ -120,23 +123,14 @@ export const Home = () => {
           />
         )}
       </NavigationRoot>
-      {user.canDeleteAccount && (
-        <DeleteAccount
+      {user.canLogout && (
+        <SettingsButton
           onClick={() => {
-            if (!deleteAccountConfirm) {
-              setDeleteAccountConfirm(true);
-              return;
-            }
-
-            void dispatch(deleteAccount())
-              .then(unwrapResult)
-              .then(() => {
-                toast.success('Successfully deleted your account.');
-              });
+            navigate('/settings');
           }}
         >
-          {deleteAccountConfirm ? 'Click to confirm?' : 'Delete Account'}
-        </DeleteAccount>
+          <SettingsIcon />
+        </SettingsButton>
       )}
       <SantaPopup />
       {Snowfall}
