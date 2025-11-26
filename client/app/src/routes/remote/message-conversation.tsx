@@ -31,10 +31,7 @@ const MessageContent = styled(Content)`
 const ContentWrapper = styled.div<{ $keyboardHeight: number }>`
   display: flex;
   flex-direction: column;
-  height: calc(
-    100dvh - 5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom) -
-      ${({ $keyboardHeight }) => $keyboardHeight}px
-  );
+  height: calc(100dvh - 5rem - env(safe-area-inset-top) - ${({ $keyboardHeight }) => $keyboardHeight}px);
   overflow: hidden;
   transition: height 0.1s ease-out;
 `;
@@ -135,14 +132,6 @@ const MessageInput = styled.textarea<{ $hasError?: boolean }>`
 
 const SendButton = styled(Button)`
   align-self: stretch;
-`;
-
-const Description = styled.p`
-  line-height: 1.25rem;
-  padding: 1rem 1.2rem;
-  border-radius: 1rem;
-  background-color: #aa0425;
-  margin-bottom: ${({ theme }) => theme.spacing.padding.l};
 `;
 
 const EmptyState = styled.div`
@@ -269,8 +258,6 @@ export const MessageConversation = ({ direction }: MessageConversationProps) => 
         ) : (
           <ContentWrapper $keyboardHeight={keyboardHeight}>
             <ScrollableContent>
-              <Description>Send anonymous messages, keeping the magic of Secret Santa alive.</Description>
-
               <MessagesContainer>
                 {messages.length === 0 ? (
                   <EmptyState>No messages yet. Start the conversation!</EmptyState>
