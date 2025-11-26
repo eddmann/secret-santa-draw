@@ -10,6 +10,7 @@ import { Button } from '@/components/Button';
 import { Content } from '@/components/Content';
 import { Header } from '@/components/Header';
 import { Loading } from '@/components/Loading';
+import useVisualViewport from '@/hooks/useVisualViewport';
 import { allocationMessagesSelector, fetchMessages, sendMessage } from '@/store/allocationMessages';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchDraw, remoteDrawsSelector } from '@/store/remoteDraws';
@@ -27,11 +28,15 @@ const MessageContent = styled(Content)`
   gap: 0;
 `;
 
-const ContentWrapper = styled.div`
+const ContentWrapper = styled.div<{ $keyboardHeight: number }>`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  height: calc(
+    100dvh - 5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom) -
+      ${({ $keyboardHeight }) => $keyboardHeight}px
+  );
   overflow: hidden;
+  transition: height 0.1s ease-out;
 `;
 
 const ScrollableContent = styled.div`
@@ -160,6 +165,16 @@ export const MessageConversation = ({ direction }: MessageConversationProps) => 
   const [message, setMessage] = useState('');
   const [hasError, setHasError] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+
+  const { keyboardHeight } = useVisualViewport({
+    onKeyboardShow: () => {
+      // Scroll input into view when keyboard appears
+      setTimeout(() => {
+        inputContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
+    },
+  });
 
   const allocationId = draw?.allocation?.id ?? '';
   const { messages, isLoading, isSending } = useAppSelector((state) =>
@@ -252,7 +267,7 @@ export const MessageConversation = ({ direction }: MessageConversationProps) => 
         {isLoading ? (
           <Loading />
         ) : (
-          <ContentWrapper>
+          <ContentWrapper $keyboardHeight={keyboardHeight}>
             <ScrollableContent>
               <Description>Send anonymous messages, keeping the magic of Secret Santa alive.</Description>
 
@@ -280,7 +295,7 @@ export const MessageConversation = ({ direction }: MessageConversationProps) => 
               </MessagesContainer>
             </ScrollableContent>
 
-            <InputContainer>
+            <InputContainer ref={inputContainerRef}>
               <MessageInput
                 ref={textareaRef}
                 value={message}
