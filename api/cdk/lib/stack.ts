@@ -1,7 +1,8 @@
 import { Construct } from "constructs";
-import { CfnOutput, Duration, Stack, StackProps } from "aws-cdk-lib";
+import { CfnOutput, Duration, Stack, StackProps, Aspects } from "aws-cdk-lib";
 import { FunctionUrlAuthType } from "aws-cdk-lib/aws-lambda";
 import { ConsoleFunction, packagePhpCode, PhpFpmFunction, PhpFunction } from "@bref.sh/constructs";
+import { PatchedBrefLayers } from "./patched-bref-layers";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
@@ -14,6 +15,8 @@ const CODE_PATH = "../app";
 export class SecretSantaApiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
+
+    Aspects.of(this).add(new PatchedBrefLayers());
 
     const workerQueue = new Queue(this, "WorkerQueue", {
       queueName: `${id}-WorkerQueue`,
